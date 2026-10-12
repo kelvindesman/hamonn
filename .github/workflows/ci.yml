@@ -25,7 +25,7 @@ jobs:
       - name: Vectors are up to date
         run: cargo run -q --bin gen-vectors && git diff --exit-code crates/hamonn-core/tests/vectors
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: { node-version-file: .nvmrc, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - name: Build + shrink wasm (wasm-pack, then wasm-opt from npm binaryen)
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: { node-version-file: .nvmrc, cache: pnpm }
       - uses: actions/download-artifact@v4
         with: { name: core-wasm-pkg, path: packages/core-wasm/pkg }
