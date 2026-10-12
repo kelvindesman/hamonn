@@ -11,6 +11,12 @@
     "./node": "./src/node.ts",
     "./wasm": "./pkg/hamonn_core_bg.wasm"
   },
-  "files": ["src", "pkg"],
-  "repository": { "type": "git", "url": "git+https://github.com/kelvindesman/hamonn.git" }
+  "files": [
+    "src",
+    "pkg"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kelvindesman/hamonn.git"
+  }
 }

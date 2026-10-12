@@ -1,4 +1,4 @@
-import { call as wasmCall, initSync } from "../pkg/hamonn_core.js";
+import { initSync, call as wasmCall } from "../pkg/hamonn_core.js";
 import type * as T from "./types.ts";
 
 export type * from "./types.ts";

@@ -1,6 +1,6 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { KernelError, invoke } from "../src/index.ts";
+import { invoke, KernelError } from "../src/index.ts";
 import { loadKernel } from "../src/node.ts";
 
 const dir = new URL("../../../crates/hamonn-core/tests/vectors/", import.meta.url);

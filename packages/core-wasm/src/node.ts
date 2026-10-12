@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { type Kernel, createKernel } from "./index.ts";
+import { createKernel, type Kernel } from "./index.ts";
 
 /** Load the kernel from the built wasm file (Node servers, CLI, tests). */
 export function loadKernel(): Kernel {
