@@ -15,6 +15,17 @@ export class FakeHost implements GitHost {
   private seq = 0;
   sinks: EventSink[] = [];
 
+  constructor() {
+    // expose `mergeBase` only when a test opts in, so both code paths in the shell are exercised
+    Object.defineProperty(this, "mergeBase", {
+      configurable: true,
+      get: () =>
+        this.mergeBaseImpl
+          ? async (_r: RepoRef, a: string, b: string) => this.mergeBaseImpl?.(a, b) ?? null
+          : undefined,
+    });
+  }
+
   repo(name: string): RepoRef {
     return { name, remote: `fake://${name}` };
   }
@@ -71,6 +82,10 @@ export class FakeHost implements GitHost {
     const paths = new Set([...Object.keys(a), ...Object.keys(b)]);
     return [...paths].filter((p) => a[p] !== b[p]).sort();
   }
+
+  /** Set to enable the optional `mergeBase` verb. */
+  mergeBaseImpl?: (a: string, b: string) => string | null;
+  mergeBase?(repo: RepoRef, a: string, b: string): Promise<string | null>;
 
   async subscribe(_repo: RepoRef, sink: EventSink): Promise<void> {
     this.sinks.push(sink);

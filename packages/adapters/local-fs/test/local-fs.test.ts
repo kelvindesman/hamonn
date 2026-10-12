@@ -31,9 +31,10 @@ describe("local-fs specifics", () => {
       await expect(host.fork({ name: "x", remote: join(root, "missing.git") }, "y")).rejects.toThrow(
         /git clone/,
       );
-      // a commit on a brand-new branch starts from an empty tree
+      // a commit on a brand-new branch starts from main
       const sha = await host.commit(repo, "fresh", { "only.txt": "x\n" });
-      expect(await host.changedPaths(repo, null, sha)).toEqual(["only.txt"]);
+      expect(await host.changedPaths(repo, null, sha)).toEqual(["a.txt", "only.txt"]);
+      expect(await host.changedPaths(repo, await host.headSha(repo, "main"), sha)).toEqual(["only.txt"]);
       // commit by sha-less ref falls back when the branch ref cannot be fetched by name
       expect(await host.headSha(repo, "fresh")).toBe(sha);
     } finally {

@@ -33,7 +33,18 @@ export function harness(opts: { scheduleDrain?: (p: string) => void } = {}) {
 
 export type Harness = ReturnType<typeof harness>;
 
+/** The in-repo ledger of a lane lives under `.lane/<id>/` so lanes never collide when they land. */
 export const LEDGER = {
   ".lane/intent.md": "do the thing",
   ".lane/handoff.md": "state: done",
 };
+
+/** Re-home bare `.lane/<file>` keys under `.lane/<laneId>/`. */
+export function laneFiles(laneId: number, files: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(files).map(([path, content]) => [
+      path.startsWith(".lane/") ? `.lane/${laneId}/${path.slice(".lane/".length)}` : path,
+      content,
+    ]),
+  );
+}

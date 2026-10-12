@@ -73,7 +73,7 @@ export class LocalFsHost implements GitHost {
     return { name, remote: bare };
   }
 
-  /** Test/demo helper: commit `files` on top of `ref` (creating it from main/empty when absent). null deletes. */
+  /** Test/demo helper: commit `files` on top of `ref` (a new ref starts from `main`, else empty). null deletes. */
   async commit(
     repo: RepoRef,
     ref: string,
@@ -83,7 +83,7 @@ export class LocalFsHost implements GitHost {
     const work = mkdtempSync(join(tmpdir(), "hamonn-lfs-"));
     try {
       await must(["init", "-q", "-b", "work", work]);
-      const parent = await this.headSha(repo, ref);
+      const parent = (await this.headSha(repo, ref)) ?? (await this.headSha(repo, "main"));
       if (parent) {
         await must(["fetch", "-q", repo.remote, `refs/heads/${ref}`], { cwd: work }).catch(() =>
           must(["fetch", "-q", repo.remote, parent], { cwd: work }),
@@ -152,6 +152,11 @@ export class LocalFsHost implements GitHost {
       after,
     ]);
     return [...new Set(out.split("\0").filter(Boolean))].sort();
+  }
+
+  async mergeBase(repo: RepoRef, a: string, b: string): Promise<string | null> {
+    const r = await git(["--git-dir", repo.remote, "merge-base", a, b]);
+    return r.ok ? r.stdout.trim() : null;
   }
 
   remoteUrl(repo: RepoRef): string {

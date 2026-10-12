@@ -32,6 +32,13 @@ export interface GitHost {
   readFile(repo: RepoRef, ref: string, path: string): Promise<string | null>;
   /** Paths that differ between `before` (null = empty tree) and `after`. Sorted, unique. */
   changedPaths(repo: RepoRef, before: string | null, after: string): Promise<string[]>;
+  /**
+   * Optional: best common ancestor of `a` and `b` as far as `repo` knows them, or null when
+   * unknown (e.g. `b` was never pushed to this fork). Lets touched-path/drift detection start
+   * from the point a rebased lane actually diverged; without it the shell falls back to the
+   * integration head the lane was opened at.
+   */
+  mergeBase?(repo: RepoRef, a: string, b: string): Promise<string | null>;
   /** Optional push-event subscription; hosts without it rely on `hamonn push` posting `/pushed`. */
   subscribe?(repo: RepoRef, sink: EventSink): Promise<void>;
   /** URL for `git clone/push`, with `token` embedded when given. */

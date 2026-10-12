@@ -237,9 +237,13 @@ export function createService(deps: Deps) {
       return store.withLock(projectName, async () => {
         const lane = await mustLane(projectName, laneId);
         if (lane.head === push.after) return reevaluate(project, lane);
-        const touched = await host.changedPaths(lane.repo, lane.base, push.after);
+        const integrationHead = await host.headSha(project.repo, project.integrationBranch);
+        const forkPoint = integrationHead
+          ? await host.mergeBase?.(lane.repo, push.after, integrationHead)
+          : null;
+        const touched = await host.changedPaths(lane.repo, forkPoint ?? lane.base, push.after);
         const [intent, handoff, evidence] = await Promise.all(
-          LEDGER_FILES.map((f) => host.readFile(lane.repo, push.after, `.lane/${f}.md`)),
+          LEDGER_FILES.map((f) => host.readFile(lane.repo, push.after, `.lane/${lane.id}/${f}.md`)),
         );
         const ledger = kernel.parseLedger({
           intent: intent ?? undefined,

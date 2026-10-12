@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { HamonnError } from "../src/index.ts";
-import { type Harness, harness, LEDGER } from "./harness.ts";
+import { type Harness, harness, LEDGER, laneFiles } from "./harness.ts";
 
 async function project(h: Harness, extra: Record<string, unknown> = {}) {
   return h.service.createProject({
@@ -19,7 +19,7 @@ async function open(h: Harness, task = "T-17", claims = ["src/rss/**"], agent = 
 /** Push `files` into the lane's fork and notify the service. */
 async function push(h: Harness, laneId: number, files: Record<string, string>) {
   const lane = (await h.service.lane("demo", laneId)).lane;
-  const sha = h.host.commit(lane.repo.name, lane.branch, files);
+  const sha = h.host.commit(lane.repo.name, lane.branch, laneFiles(laneId, files));
   return h.service.onPushed("demo", laneId, { after: sha });
 }
 
@@ -146,7 +146,7 @@ describe("push → READY", () => {
     await open(h);
     const v1 = await push(h, 1, { "src/rss/feed.ts": "v1", ...LEDGER });
     expect(v1.lane.state).toBe("PUSHED");
-    expect(v1.lane.touched).toEqual([".lane/handoff.md", ".lane/intent.md", "src/rss/feed.ts"]);
+    expect(v1.lane.touched).toEqual([".lane/1/handoff.md", ".lane/1/intent.md", "src/rss/feed.ts"]);
     expect(v1.lane.drift).toEqual([]);
     expect(v1.readiness.reasons).toEqual([{ code: "CHECK_MISSING", name: "unit" }]);
 
@@ -186,12 +186,40 @@ describe("push → READY", () => {
     expect(signed.readiness.reasons).toEqual([{ code: "DRIFT", paths: ["wrangler.jsonc"] }]);
   });
 
+  it("measures touched paths from the merge-base when the host can compute it", async () => {
+    const h = harness();
+    await project(h);
+    await open(h);
+    const laneRepo = (await h.service.lane("demo", 1)).lane.repo.name;
+    // peer work lands on main; the lane rebases onto it (its fork now contains it) and adds its own file
+    const peer = h.host.commit("demo-app", "main", { "src/peer.ts": "peer" });
+    h.host.heads.get(laneRepo)?.set("main", peer);
+    const sha = h.host.commit(laneRepo, "main", laneFiles(1, { "src/rss/feed.ts": "mine", ...LEDGER }));
+    h.host.mergeBaseImpl = () => peer;
+    const rebased = await h.service.onPushed("demo", 1, { after: sha });
+    expect(rebased.lane.touched).toEqual([".lane/1/handoff.md", ".lane/1/intent.md", "src/rss/feed.ts"]);
+    expect(rebased.lane.drift).toEqual([]);
+  });
+
+  it("falls back to the opening base when merge-base is unknown or the integration branch vanished", async () => {
+    const h = harness();
+    await project(h);
+    await open(h);
+    h.host.mergeBaseImpl = () => null;
+    const laneRepo = (await h.service.lane("demo", 1)).lane.repo.name;
+    const sha = h.host.commit(laneRepo, "main", { "src/rss/feed.ts": "v1" });
+    expect((await h.service.onPushed("demo", 1, { after: sha })).lane.touched).toEqual(["src/rss/feed.ts"]);
+    h.host.heads.get("demo-app")?.delete("main");
+    const sha2 = h.host.commit(laneRepo, "main", { "src/rss/feed.ts": "v2" });
+    expect((await h.service.onPushed("demo", 1, { after: sha2 })).lane.touched).toEqual(["src/rss/feed.ts"]);
+  });
+
   it("is idempotent per head (queue event + CLI both post /pushed)", async () => {
     const h = harness();
     await project(h);
     await open(h);
     const lane = (await h.service.lane("demo", 1)).lane;
-    const sha = h.host.commit(lane.repo.name, "main", { "src/rss/feed.ts": "v1", ...LEDGER });
+    const sha = h.host.commit(lane.repo.name, "main", laneFiles(1, { "src/rss/feed.ts": "v1", ...LEDGER }));
     await h.service.onPushed("demo", 1, { after: sha });
     const before = h.logs.filter((l) => l.event === "lane.pushed").length;
     await h.service.onPushed("demo", 1, { after: sha });
@@ -427,7 +455,7 @@ describe("events", () => {
     const h = harness();
     await project(h);
     await open(h);
-    const sha = h.host.commit("demo-l1", "main", { "src/rss/feed.ts": "v1", ...LEDGER });
+    const sha = h.host.commit("demo-l1", "main", laneFiles(1, { "src/rss/feed.ts": "v1", ...LEDGER }));
     const view = await h.service.handlePushEvent({ repoName: "demo-l1", after: sha });
     expect(view?.lane.state).toBe("PUSHED");
   });
@@ -437,7 +465,7 @@ describe("events", () => {
     await project(h, { laneMode: "branch" });
     await open(h);
     h.host.heads.get("demo-app")?.set("lane/1", "c1000000");
-    const sha = h.host.commit("demo-app", "lane/1", { "src/rss/feed.ts": "v1", ...LEDGER });
+    const sha = h.host.commit("demo-app", "lane/1", laneFiles(1, { "src/rss/feed.ts": "v1", ...LEDGER }));
     const view = await h.service.handlePushEvent({
       repoName: "demo-app",
       ref: "refs/heads/lane/1",

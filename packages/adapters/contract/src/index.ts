@@ -62,6 +62,16 @@ export function describeGitHostContract(name: string, make: () => Promise<HostFi
       expect(all).toEqual(["README.md", "src/a.ts", "src/new/c.ts"]);
     });
 
+    it("mergeBase (when supported) finds the fork point or null", async () => {
+      if (!fx.host.mergeBase) return;
+      const repo = await fx.seed(unique("mb"), { "a.txt": "1\n" });
+      const base = (await fx.host.headSha(repo, "main")) as string;
+      const featureHead = await fx.commit(repo, "feature", { "f.txt": "f\n" });
+      const mainHead = await fx.commit(repo, "main", { "m.txt": "m\n" });
+      expect(await fx.host.mergeBase(repo, featureHead, mainHead)).toBe(base);
+      expect(await fx.host.mergeBase(repo, featureHead, "0".repeat(40))).toBeNull();
+    });
+
     it("fork returns a distinct repo with the same history", async () => {
       const fork = await fx.host.fork(src, unique("fork"));
       expect(fork.name).not.toBe(src.name);

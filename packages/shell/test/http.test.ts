@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { normalizeError } from "../src/errors.ts";
 import { createApi, safeEqual, type WebhookNormalizer } from "../src/http.ts";
 import { consoleLogger, HamonnError, silentLogger, systemClock } from "../src/index.ts";
-import { harness, LEDGER } from "./harness.ts";
+import { harness, LEDGER, laneFiles } from "./harness.ts";
 
 // biome-ignore lint/suspicious/noExplicitAny: loosely-typed JSON in HTTP assertions
 type Json = any;
@@ -72,7 +72,7 @@ describe("routes", () => {
     });
     expect(opened.status).toBe(201);
     expect(opened.body.lane.id).toBe(1);
-    const sha = s.h.host.commit("demo-l1", "main", { "src/rss/feed.ts": "A", ...LEDGER });
+    const sha = s.h.host.commit("demo-l1", "main", laneFiles(1, { "src/rss/feed.ts": "A", ...LEDGER }));
     const pushed = await s.call("POST", "/api/projects/demo/lanes/1/pushed", { before: "x", after: sha });
     expect(pushed.body.lane.state).toBe("PUSHED");
     const checked = await s.call("POST", "/api/projects/demo/lanes/1/checks", {
@@ -102,7 +102,11 @@ describe("routes", () => {
       intent: "i",
       claims: ["a/**", "wrangler.jsonc"],
     });
-    const sha = s.h.host.commit("demo-l1", "main", { "a/x": "1", "wrangler.jsonc": "{y}", ...LEDGER });
+    const sha = s.h.host.commit(
+      "demo-l1",
+      "main",
+      laneFiles(1, { "a/x": "1", "wrangler.jsonc": "{y}", ...LEDGER }),
+    );
     await s.call("POST", "/api/projects/demo/lanes/1/pushed", { after: sha });
     await s.call("POST", "/api/projects/demo/lanes/1/checks", { name: "unit", status: "pass" });
     expect((await s.call("POST", "/api/projects/demo/lanes/1/sign", { by: "owner" })).body.lane.state).toBe(
@@ -186,7 +190,7 @@ describe("webhooks", () => {
       intent: "i",
       claims: ["a/**"],
     });
-    const sha = s.h.host.commit("demo-l1", "main", { "a/x": "1", ...LEDGER });
+    const sha = s.h.host.commit("demo-l1", "main", laneFiles(1, { "a/x": "1", ...LEDGER }));
     const ok = await s.app.request("/hooks/fake", {
       method: "POST",
       body: JSON.stringify({ repo: "demo-l1", after: sha }),

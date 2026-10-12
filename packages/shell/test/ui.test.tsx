@@ -1,7 +1,7 @@
 import type { Reason } from "@hamonn/core";
 import { describe, expect, it } from "vitest";
 import { BoardView, createUi, reasonText } from "../src/ui.tsx";
-import { harness, LEDGER } from "./harness.ts";
+import { harness, LEDGER, laneFiles } from "./harness.ts";
 
 async function scene() {
   const h = harness();
@@ -16,7 +16,9 @@ async function scene() {
     (await h.service.openLane("demo", { task, agent, intent: `work <${agent}>`, claims })).lane.id;
   const push = async (id: number, files: Record<string, string>) => {
     const lane = (await h.service.lane("demo", id)).lane;
-    return h.service.onPushed("demo", id, { after: h.host.commit(lane.repo.name, lane.branch, files) });
+    return h.service.onPushed("demo", id, {
+      after: h.host.commit(lane.repo.name, lane.branch, laneFiles(id, files)),
+    });
   };
   const get = async (path: string) => {
     const res = await ui.request(path);

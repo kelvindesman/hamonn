@@ -30,6 +30,30 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.4)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
+  apps/node:
+    dependencies:
+      '@hamonn/adapter-local-fs':
+        specifier: workspace:*
+        version: link:../../packages/adapters/local-fs
+      '@hamonn/core':
+        specifier: workspace:*
+        version: link:../../packages/core-wasm
+      '@hamonn/gitwire-system-git':
+        specifier: workspace:*
+        version: link:../../packages/adapters/gitwire-system-git
+      '@hamonn/shell':
+        specifier: workspace:*
+        version: link:../../packages/shell
+      '@hamonn/store-sqlite':
+        specifier: workspace:*
+        version: link:../../packages/adapters/store-sqlite
+      '@hono/node-server':
+        specifier: ^1
+        version: 1.19.17(hono@4.13.13)
+      hono:
+        specifier: ^4
+        version: 4.13.13
+
   packages/adapters/contract:
     dependencies:
       '@hamonn/core':
@@ -412,6 +436,12 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@hono/node-server@1.19.17':
+    resolution: {integrity: sha512-dSneS5qhiauZWGDCeK4o695Xd9nUNjviSZCMQrj10eetr8Uln1ucn6bbphOM6UynAMMtNIzZNSpL9vnASJwrPQ==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      hono: ^4
 
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
@@ -1269,6 +1299,10 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
+
+  '@hono/node-server@1.19.17(hono@4.13.13)':
+    dependencies:
+      hono: 4.13.13
 
   '@jridgewell/resolve-uri@3.1.2': {}
 

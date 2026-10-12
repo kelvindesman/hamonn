@@ -1,0 +1,25 @@
+{
+  "name": "@hamonn/node",
+  "version": "0.1.0",
+  "description": "hamonn self-host runtime: Hono on Node + SQLite + system git",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "hamonn-serve": "./src/main.ts"
+  },
+  "scripts": {
+    "start": "tsx src/main.ts"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "@hamonn/adapter-local-fs": "workspace:*",
+    "@hamonn/core": "workspace:*",
+    "@hamonn/gitwire-system-git": "workspace:*",
+    "@hamonn/shell": "workspace:*",
+    "@hamonn/store-sqlite": "workspace:*",
+    "@hono/node-server": "^1",
+    "hono": "^4"
+  }
+}
