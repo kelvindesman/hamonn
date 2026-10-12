@@ -1,0 +1,8 @@
+{
+  "fn": "matches",
+  "input": {
+    "glob": "src/**/b.ts",
+    "path": "src/a/b.ts"
+  },
+  "output": true
+}

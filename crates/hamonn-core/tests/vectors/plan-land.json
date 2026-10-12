@@ -1,0 +1,85 @@
+{
+  "fn": "planLand",
+  "input": {
+    "lane": {
+      "agent": "claude-A",
+      "allowDrift": false,
+      "base": "000",
+      "branch": "main",
+      "claims": [
+        "src/rss/**"
+      ],
+      "drift": [],
+      "gateRequired": false,
+      "head": "aaa",
+      "id": 42,
+      "intent": "feat: rss",
+      "ledger": {
+        "evidence": false,
+        "handoff": true,
+        "handoffTooLong": false,
+        "intent": true
+      },
+      "openedAt": 1,
+      "overlaps": [],
+      "repo": {
+        "name": "demo-l42",
+        "remote": "https://x/42.git"
+      },
+      "state": "READY",
+      "taskId": "T-17",
+      "touched": [],
+      "updatedAt": 1
+    },
+    "now": 77,
+    "project": {
+      "gatedPaths": [
+        "wrangler.jsonc",
+        "src/db/**"
+      ],
+      "integrationBranch": "main",
+      "laneMode": "fork",
+      "name": "demo",
+      "requiredChecks": [
+        "unit"
+      ]
+    }
+  },
+  "output": {
+    "head": "aaa",
+    "integrationBranch": "main",
+    "lane": {
+      "agent": "claude-A",
+      "allowDrift": false,
+      "base": "000",
+      "branch": "main",
+      "claims": [
+        "src/rss/**"
+      ],
+      "drift": [],
+      "gateRequired": false,
+      "head": "aaa",
+      "id": 42,
+      "intent": "feat: rss",
+      "ledger": {
+        "evidence": false,
+        "handoff": true,
+        "handoffTooLong": false,
+        "intent": true
+      },
+      "openedAt": 1,
+      "overlaps": [],
+      "repo": {
+        "name": "demo-l42",
+        "remote": "https://x/42.git"
+      },
+      "state": "LANDING",
+      "taskId": "T-17",
+      "touched": [],
+      "updatedAt": 77
+    },
+    "laneBranch": "main",
+    "message": "Land lane #42 [T-17] by claude-A: feat: rss",
+    "tokenTtlSec": 600
+  }
+}

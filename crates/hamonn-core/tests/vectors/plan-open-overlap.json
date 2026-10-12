@@ -1,0 +1,86 @@
+{
+  "fn": "planOpen",
+  "input": {
+    "openLanes": [
+      {
+        "claims": [
+          "src/rss/**"
+        ],
+        "id": 40,
+        "state": "READY",
+        "taskId": "T-17"
+      },
+      {
+        "claims": [
+          "src/cron/**"
+        ],
+        "id": 41,
+        "state": "PUSHED",
+        "taskId": "T-18"
+      }
+    ],
+    "req": {
+      "agent": "claude-C",
+      "base": "base0",
+      "claims": [
+        "src/rss/**"
+      ],
+      "intent": "feat: rss",
+      "laneId": 44,
+      "now": 100,
+      "project": {
+        "gatedPaths": [
+          "wrangler.jsonc",
+          "src/db/**"
+        ],
+        "integrationBranch": "main",
+        "laneMode": "fork",
+        "name": "demo",
+        "requiredChecks": [
+          "unit"
+        ]
+      },
+      "taskId": "T-17"
+    }
+  },
+  "output": {
+    "branch": "main",
+    "forkName": "demo-l44",
+    "hint": "claims overlap open lane(s) #40 (same task: compete as a candidate)",
+    "lane": {
+      "agent": "claude-C",
+      "allowDrift": false,
+      "base": "base0",
+      "branch": "main",
+      "claims": [
+        "src/rss/**"
+      ],
+      "drift": [],
+      "gateRequired": false,
+      "id": 44,
+      "intent": "feat: rss",
+      "ledger": {
+        "evidence": false,
+        "handoff": false,
+        "handoffTooLong": false,
+        "intent": false
+      },
+      "openedAt": 100,
+      "overlaps": [
+        40
+      ],
+      "repo": {
+        "name": "demo-l44",
+        "remote": ""
+      },
+      "state": "OPEN",
+      "taskId": "T-17",
+      "touched": [],
+      "updatedAt": 100
+    },
+    "overlaps": [
+      40
+    ],
+    "tokenTtlSec": 3600
+  }
+}

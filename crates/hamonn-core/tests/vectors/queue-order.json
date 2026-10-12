@@ -1,0 +1,19 @@
+{
+  "fn": "queueOrder",
+  "input": {
+    "queue": [
+      {
+        "enqueuedAt": 20,
+        "laneId": 7
+      },
+      {
+        "enqueuedAt": 10,
+        "laneId": 5
+      }
+    ]
+  },
+  "output": [
+    5,
+    7
+  ]
+}

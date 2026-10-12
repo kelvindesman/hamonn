@@ -1,0 +1,11 @@
+node_modules/
+target/
+dist/
+coverage/
+.dev.vars
+.env
+.wrangler/
+*.log
+packages/core-wasm/pkg/
+packages/core-wasm/pkg-node/
+.lane/lane.json

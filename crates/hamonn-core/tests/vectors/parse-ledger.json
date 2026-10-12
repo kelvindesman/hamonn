@@ -1,0 +1,15 @@
+{
+  "fn": "parseLedger",
+  "input": {
+    "evidence": "",
+    "handoff": "a\nb\n",
+    "intent": "do x"
+  },
+  "output": {
+    "evidence": false,
+    "handoff": true,
+    "handoffLines": 2,
+    "handoffTooLong": false,
+    "intent": true
+  }
+}

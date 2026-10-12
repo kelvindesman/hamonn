@@ -1,0 +1,103 @@
+{
+  "fn": "compare",
+  "input": {
+    "checks": [
+      {
+        "at": 1,
+        "laneId": 40,
+        "name": "unit",
+        "status": "pass"
+      }
+    ],
+    "lanes": [
+      {
+        "agent": "claude-A",
+        "allowDrift": false,
+        "base": "000",
+        "branch": "main",
+        "claims": [
+          "src/rss/**"
+        ],
+        "drift": [],
+        "gateRequired": false,
+        "head": "aaa",
+        "id": 40,
+        "intent": "feat: rss",
+        "ledger": {
+          "evidence": false,
+          "handoff": true,
+          "handoffTooLong": false,
+          "intent": true
+        },
+        "openedAt": 1,
+        "overlaps": [],
+        "repo": {
+          "name": "demo-l40",
+          "remote": "https://x/40.git"
+        },
+        "state": "READY",
+        "taskId": "T-17",
+        "touched": [],
+        "updatedAt": 1
+      },
+      {
+        "agent": "claude-A",
+        "allowDrift": false,
+        "base": "000",
+        "branch": "main",
+        "claims": [
+          "src/rss/**"
+        ],
+        "drift": [],
+        "gateRequired": false,
+        "head": "aaa",
+        "id": 44,
+        "intent": "feat: rss",
+        "ledger": {
+          "evidence": false,
+          "handoff": true,
+          "handoffTooLong": false,
+          "intent": true
+        },
+        "openedAt": 1,
+        "overlaps": [],
+        "repo": {
+          "name": "demo-l44",
+          "remote": "https://x/44.git"
+        },
+        "state": "PUSHED",
+        "taskId": "T-17",
+        "touched": [],
+        "updatedAt": 1
+      }
+    ]
+  },
+  "output": [
+    {
+      "agent": "claude-A",
+      "checksFailed": 0,
+      "checksPassed": 1,
+      "checksPending": 0,
+      "claimsKept": true,
+      "driftCount": 0,
+      "laneId": 40,
+      "ledgerOk": true,
+      "score": 15,
+      "state": "READY",
+      "touchedCount": 0
+    },
+    {
+      "agent": "claude-A",
+      "checksFailed": 0,
+      "checksPassed": 0,
+      "checksPending": 0,
+      "claimsKept": true,
+      "driftCount": 0,
+      "laneId": 44,
+      "ledgerOk": true,
+      "score": 5,
+      "state": "PUSHED",
+      "touchedCount": 0
+    }
+  ]
+}

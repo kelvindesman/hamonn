@@ -1,0 +1,12 @@
+{
+  "fn": "claimsOverlap",
+  "input": {
+    "a": [
+      "src/rss/**"
+    ],
+    "b": [
+      "src/rss/feed.ts"
+    ]
+  },
+  "output": true
+}

@@ -1,0 +1,8 @@
+{
+  "error": "INVALID_TRANSITION",
+  "fn": "transition",
+  "input": {
+    "from": "LANDED",
+    "to": "PUSHED"
+  }
+}

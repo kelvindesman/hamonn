@@ -1,0 +1,16 @@
+{
+  "fn": "drift",
+  "input": {
+    "claims": [
+      "src/rss/"
+    ],
+    "touched": [
+      "src/rss/a.ts",
+      "src/db/x.ts",
+      ".lane/handoff.md"
+    ]
+  },
+  "output": [
+    "src/db/x.ts"
+  ]
+}
