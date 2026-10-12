@@ -1,0 +1,29 @@
+name: Release
+on:
+  push: { branches: [main] }
+permissions: { contents: write, pull-requests: write, id-token: write }
+concurrency: { group: release, cancel-in-progress: false }
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: wasm32-unknown-unknown }
+      - uses: taiki-e/install-action@v2
+        with: { tool: wasm-pack }
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: pnpm, registry-url: "https://registry.npmjs.org" }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:wasm
+      - uses: changesets/action@v1
+        with:
+          publish: pnpm changeset publish
+          title: "chore: version packages"
+          commit: "chore: version packages"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          NPM_TOKEN: "${{ secrets.NPM_TOKEN }}"
+          NPM_CONFIG_PROVENANCE: "true"

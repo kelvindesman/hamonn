@@ -1,0 +1,11 @@
+name: Feature request
+description: Propose a change to lanes, claims, landing, or the API
+labels: [enhancement]
+body:
+  - type: textarea
+    id: pain
+    attributes: { label: Which pain does this remove?, description: "Reference docs/pain-points.md if it applies." }
+    validations: { required: true }
+  - type: textarea
+    id: proposal
+    attributes: { label: Proposal }

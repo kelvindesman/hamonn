@@ -22,13 +22,16 @@
     "check": "pnpm lint && pnpm typecheck && pnpm test:rust && pnpm test",
     "dev": "pnpm --filter @hamonn/worker dev",
     "deploy": "pnpm --filter @hamonn/worker deploy",
-    "prepare": "git config core.hooksPath .githooks || true"
+    "prepare": "lefthook install || true",
+    "repo:map": "tsx scripts/repo-map.ts",
+    "changeset": "changeset"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
     "@changesets/cli": "^3.0.3",
     "@types/node": "^26.6.5",
     "@vitest/coverage-v8": "^5.0.4",
+    "lefthook": "^2.2.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.4"

@@ -1,6 +1,7 @@
 #!/usr/bin/env -S npx tsx
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { GithubHost } from "@hamonn/adapter-github";
 import { serve } from "@hono/node-server";
 import { buildApp } from "./app.ts";
 
@@ -14,7 +15,18 @@ const root = resolve(env.HAMONN_ROOT ?? "./hamonn-data/repos");
 mkdirSync(root, { recursive: true });
 const dbPath = resolve(env.HAMONN_DB ?? "./hamonn-data/hamonn.db");
 mkdirSync(dirname(dbPath), { recursive: true });
+
+// HAMONN_HOST=github keeps the repos on GitHub (lanes are forks); local-fs keeps bare repos under HAMONN_ROOT.
+let host: GithubHost | undefined;
+if ((env.HAMONN_HOST ?? "local-fs") === "github") {
+  if (!env.GITHUB_TOKEN) {
+    console.error("GITHUB_TOKEN is required when HAMONN_HOST=github");
+    process.exit(1);
+  }
+  host = new GithubHost({ token: env.GITHUB_TOKEN, forkOrg: env.GITHUB_FORK_ORG });
+}
 const { app } = buildApp({
+  host,
   adminKey,
   root,
   dbPath,

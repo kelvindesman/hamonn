@@ -20,7 +20,8 @@
     "@hamonn/shell": "workspace:*",
     "@hamonn/store-sqlite": "workspace:*",
     "@hono/node-server": "^1",
-    "hono": "^4"
+    "hono": "^4",
+    "@hamonn/adapter-github": "workspace:*"
   },
   "exports": {
     "./app": "./src/app.ts"

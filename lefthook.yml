@@ -1,0 +1,14 @@
+# Git hooks (installed by `pnpm install` via the prepare script).
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: "*.{ts,tsx,js,mjs,json,jsonc}"
+      run: pnpm exec biome check --no-errors-on-unmatched {staged_files}
+    rustfmt:
+      glob: "*.rs"
+      run: cargo fmt --check
+pre-push:
+  commands:
+    check:
+      run: pnpm check

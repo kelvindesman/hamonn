@@ -1,0 +1,60 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions: { contents: read }
+concurrency: { group: "ci-${{ github.ref }}", cancel-in-progress: true }
+
+jobs:
+  kernel:
+    name: Rust kernel (100% coverage) + wasm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: wasm32-unknown-unknown, components: "rustfmt, clippy, llvm-tools-preview" }
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        with: { tool: "cargo-llvm-cov,wasm-pack" }
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+      - name: Coverage gate (lines + functions must be 100%)
+        run: cargo llvm-cov --ignore-filename-regex 'src/(bin|wasm)' --fail-under-lines 100 --fail-under-functions 100
+      - name: Vectors are up to date
+        run: cargo run -q --bin gen-vectors && git diff --exit-code crates/hamonn-core/tests/vectors
+      - name: Build wasm
+        run: wasm-pack build crates/hamonn-core --release --target web --out-dir ../../packages/core-wasm/pkg --out-name hamonn_core
+      - uses: actions/upload-artifact@v4
+        with: { name: core-wasm-pkg, path: packages/core-wasm/pkg, retention-days: 7 }
+
+  typescript:
+    name: TypeScript (lint, types, tests, contracts, worker build)
+    needs: kernel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: pnpm }
+      - uses: actions/download-artifact@v4
+        with: { name: core-wasm-pkg, path: packages/core-wasm/pkg }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm --filter @hamonn/worker typecheck
+      - name: Tests (shell is gated at 100% lines/branches/functions/statements)
+        run: pnpm test
+      - name: Worker bundles with the wasm kernel
+        run: pnpm --filter @hamonn/worker build
+      - name: Landing runs inside workerd (isomorphic-git, no Cloudflare account)
+        run: pnpm --filter @hamonn/worker exec tsx test/workerd/run-smoke.mjs
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v2
+        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }

@@ -1,0 +1,14 @@
+name: Bug report
+description: Something landed wrong, or didn't land when it should
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes: { label: What happened?, description: "Include lane id, state, and the error code if any." }
+    validations: { required: true }
+  - type: input
+    id: runtime
+    attributes: { label: Runtime / host, placeholder: "worker + cloudflare-artifacts | node + github | node + local-fs" }
+  - type: textarea
+    id: repro
+    attributes: { label: Minimal reproduction, description: "A failing test against fakes is ideal." }

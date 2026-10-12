@@ -148,6 +148,19 @@ const OPTIONS = {
   help: { type: "boolean", short: "h" },
 } as const;
 
+/** `-c user.*` flags used only when git has no identity configured, so `commit` never fails on a fresh agent box. */
+async function identityArgs(c: Ctx, cwd: string): Promise<string[]> {
+  const has = (await c.io.git(["config", "user.email"], { cwd })).code === 0;
+  return has ? [] : ["-c", "user.name=hamonn-agent", "-c", "user.email=agent@hamonn.invalid"];
+}
+
+async function commitAll(c: Ctx, cwd: string, message: string): Promise<void> {
+  await c.git(cwd, "add", "-A");
+  if ((await c.git(cwd, "status", "--porcelain")).trim()) {
+    await c.git(cwd, ...(await identityArgs(c, cwd)), "commit", "-q", "-m", message);
+  }
+}
+
 async function setRemote(c: Ctx, dir: string, remote: string): Promise<void> {
   const has = (await c.io.git(["remote", "get-url", "origin"], { cwd: dir })).code === 0;
   await c.git(dir, "remote", has ? "set-url" : "add", "origin", remote);
@@ -197,22 +210,15 @@ async function commands(
       writeFile(join(dir, STATE_FILE), `${JSON.stringify(state, null, 2)}\n`);
       appendFileSync(join(dir, ".git/info/exclude"), "\n.lane/lane.json\n");
       writeFile(join(dir, `.lane/${body.lane.id}/intent.md`), `${intent}\n\nclaims: ${claims.join(" ")}\n`);
+      // Commit the intent now: an uncommitted ledger would not survive a `git reset --hard`.
+      await commitAll(c, dir, `hamonn: open lane #${body.lane.id}`);
       io.out(`lane #${body.lane.id} opened on ${body.lane.repo.name} (${body.lane.branch}) in ${dir}`);
       if (body.hint) io.out(`⚠ ${body.hint}`);
       return 0;
     }
     case "push": {
       const s = loadState(cwd);
-      await c.git(cwd, "add", "-A");
-      if ((await c.git(cwd, "status", "--porcelain")).trim()) {
-        await c.git(
-          cwd,
-          "commit",
-          "-q",
-          "-m",
-          (v.message as string | undefined) ?? `hamonn: lane #${s.laneId}`,
-        );
-      }
+      await commitAll(c, cwd, (v.message as string | undefined) ?? `hamonn: lane #${s.laneId}`);
       // Safe by construction: this is the agent's own fork/branch, never the integration branch.
       await c.git(cwd, "push", "-q", "--force", "origin", `HEAD:refs/heads/${s.branch}`);
       const after = (await c.git(cwd, "rev-parse", "HEAD")).trim();

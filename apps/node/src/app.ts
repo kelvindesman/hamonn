@@ -1,3 +1,4 @@
+import { normalizeGithubWebhook } from "@hamonn/adapter-github";
 import { LocalFsHost } from "@hamonn/adapter-local-fs";
 import { loadKernel } from "@hamonn/core/node";
 import { SystemGitWire } from "@hamonn/gitwire-system-git";
@@ -57,7 +58,11 @@ export function buildApp(config: NodeConfig) {
   app.route("/", createUi(service));
   app.route(
     "/",
-    createApi(service, { adminKey: config.adminKey, hooks: config.hooks, hookSecret: config.hookSecret }),
+    createApi(service, {
+      adminKey: config.adminKey,
+      hooks: { github: normalizeGithubWebhook, ...config.hooks },
+      hookSecret: config.hookSecret,
+    }),
   );
   return { app, service, store, host, close: () => store.close() };
 }

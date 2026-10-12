@@ -1,0 +1,24 @@
+name: Adapter request
+description: Support a new git host, store, or landing engine
+labels: [adapter]
+body:
+  - type: input
+    id: host
+    attributes: { label: Host / store, placeholder: "Gitea, Azure DevOps, Postgres, ..." }
+    validations: { required: true }
+  - type: checkboxes
+    id: verbs
+    attributes:
+      label: The host can do these (tick what exists)
+      options:
+        - label: fork a repo (or branch-as-lane with scoped tokens)
+        - label: mint a short-lived token scoped to one repo/branch
+        - label: revoke that token
+        - label: resolve a ref to a commit sha
+        - label: read a file at a ref
+        - label: list paths changed between two commits
+        - label: git smart-HTTP clone/fetch/push with that token
+        - label: push events (webhook / queue) — optional
+  - type: textarea
+    id: notes
+    attributes: { label: Notes, description: "API docs links; are you willing to contribute it? See CONTRIBUTING.md." }
