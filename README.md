@@ -79,7 +79,7 @@ More: [docs/architecture.md](docs/architecture.md).
 | local-fs host, system-git wire, SQL stores | shared contract suites against **real git** / real SQLite |
 | isomorphic-git wire | contract suite against `git http-backend` with token auth, **and a landing run inside workerd** |
 | Whole system | `apps/node/test/e2e.test.ts`, `apps/cli/test/cli.test.ts`, `demo/*.sh` — real git, real HTTP |
-| Worker | bundles (1.27 MB / 268 KB gz incl. wasm); boots in workerd with DO + wasm; queue/DO logic unit-tested |
+| Worker | bundles (995 KB / 256 KB gz incl. the 267 KB wasm kernel); boots in workerd with DO + wasm; queue/DO logic unit-tested |
 | **Cloudflare Artifacts adapter** | contract suite against a fake binding over real git objects. **Not yet run against a live Artifacts account** — the first live run is the remaining verification step |
 | GitHub adapter | contract suite against a fake REST server (shapes hand-modelled from the docs, **not recorded**). PAT passthrough is not fork-scoped |
 | GitLab / Bitbucket | not built |

@@ -10,7 +10,7 @@
     "node": ">=22.13"
   },
   "scripts": {
-    "build:wasm": "wasm-pack build crates/hamonn-core --release --target web --out-dir ../../packages/core-wasm/pkg --out-name hamonn_core",
+    "build:wasm": "node scripts/build-wasm.mjs",
     "vectors": "cargo run -q --bin gen-vectors",
     "test:rust": "cargo test -q",
     "cov:rust": "cargo llvm-cov --ignore-filename-regex 'src/(bin|wasm)' --fail-under-lines 100 --fail-under-functions 100",
@@ -31,6 +31,7 @@
     "@changesets/cli": "^3.0.3",
     "@types/node": "^26.6.5",
     "@vitest/coverage-v8": "^5.0.4",
+    "binaryen": "^132.0.0",
     "lefthook": "^2.2.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",

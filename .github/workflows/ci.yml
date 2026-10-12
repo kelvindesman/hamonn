@@ -23,8 +23,12 @@ jobs:
         run: cargo llvm-cov --ignore-filename-regex 'src/(bin|wasm)' --fail-under-lines 100 --fail-under-functions 100
       - name: Vectors are up to date
         run: cargo run -q --bin gen-vectors && git diff --exit-code crates/hamonn-core/tests/vectors
-      - name: Build wasm
-        run: wasm-pack build crates/hamonn-core --release --target web --out-dir ../../packages/core-wasm/pkg --out-name hamonn_core
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Build + shrink wasm (wasm-pack, then wasm-opt from npm binaryen)
+        run: pnpm build:wasm
       - uses: actions/upload-artifact@v4
         with: { name: core-wasm-pkg, path: packages/core-wasm/pkg, retention-days: 7 }
 

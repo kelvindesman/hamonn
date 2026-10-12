@@ -10,7 +10,7 @@ Status legend: ✅ done and verified · 🟡 done, verification pending · ⬜ n
 - ✅ CLI (`hamonn`) tested against the Node server
 - ✅ GitHub adapter (fake REST over real git) + webhook normalizer
 - 🟡 Cloudflare Artifacts adapter: contract-tested against a fake binding over real git objects; **needs a live run**
-- 🟡 Worker: bundles (268 KB gz), boots in workerd, DO + wasm exercised; Artifacts binding cannot run locally
+- 🟡 Worker: bundles (256 KB gz, 267 KB wasm), boots in workerd, DO + wasm exercised; Artifacts binding cannot run locally
 - ⬜ Deploy to a real Cloudflare account (needs `CLOUDFLARE_API_TOKEN`/`ACCOUNT_ID`); subscriptions via `hamonn setup`
 - ⬜ Deploy-button test from a fresh account; npm publish of workspace packages
 - ⬜ GitLab / Bitbucket adapters

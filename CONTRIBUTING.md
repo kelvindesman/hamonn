@@ -9,7 +9,7 @@ nvm use                       # Node 22 (.nvmrc)
 rustup show                   # installs the pinned toolchain + wasm32 target (rust-toolchain.toml)
 cargo install wasm-pack cargo-llvm-cov --locked
 pnpm install
-pnpm build:wasm               # Rust -> packages/core-wasm/pkg
+pnpm build:wasm               # Rust -> packages/core-wasm/pkg (wasm-pack + wasm-opt)
 pnpm check                    # lint + typecheck + rust tests + TS tests with coverage gates
 ```
 Run one test file: `pnpm test:one packages/shell/test/service.test.ts`.

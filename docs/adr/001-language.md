@@ -24,7 +24,7 @@ bindings, Durable Objects, isomorphic-git, Hono, the Artifacts binding types) is
 
 ## Consequences
 + The decision logic is unit-tested to 100% and identical on Workers and Node.
-+ Wasm instance is created once per isolate (`createKernel(module)`); 548 KB unoptimized (no `wasm-opt` in the build env yet).
++ Wasm instance is created once per isolate (`createKernel(module)`); 267 KB after `wasm-opt -Oz` (binaryen from npm; `pnpm build:wasm`).
 − A Rust toolchain is needed to build `pkg/`; published npm packages ship the prebuilt wasm.
 − Two type definitions (serde ↔ TS) are kept in sync by the vector replay, not generated.
 Follow-ups: static `hamonn` Rust CLI for sandboxes; `gix`-based wire for Node.
