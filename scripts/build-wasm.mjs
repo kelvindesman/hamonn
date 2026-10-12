@@ -10,15 +10,37 @@ const wasm = join(pkg, "hamonn_core_bg.wasm");
 
 execFileSync(
   "wasm-pack",
-  ["build", "crates/hamonn-core", "--release", "--target", "web", "--out-dir", "../../packages/core-wasm/pkg", "--out-name", "hamonn_core"],
+  [
+    "build",
+    "crates/hamonn-core",
+    "--release",
+    "--target",
+    "web",
+    "--out-dir",
+    "../../packages/core-wasm/pkg",
+    "--out-name",
+    "hamonn_core",
+  ],
   { cwd: root, stdio: "inherit" },
 );
 const before = statSync(wasm).size;
 const wasmOpt = join(createRequire(import.meta.url).resolve("binaryen/package.json"), "../bin/wasm-opt");
 execFileSync(
   process.execPath,
-  [wasmOpt, "-Oz", "--enable-bulk-memory", "--enable-reference-types", "--enable-sign-ext", "--enable-mutable-globals",
-   "--enable-nontrapping-float-to-int", "--strip-debug", "--strip-producers", wasm, "-o", `${wasm}.opt`],
+  [
+    wasmOpt,
+    "-Oz",
+    "--enable-bulk-memory",
+    "--enable-reference-types",
+    "--enable-sign-ext",
+    "--enable-mutable-globals",
+    "--enable-nontrapping-float-to-int",
+    "--strip-debug",
+    "--strip-producers",
+    wasm,
+    "-o",
+    `${wasm}.opt`,
+  ],
   { stdio: "inherit" },
 );
 renameSync(`${wasm}.opt`, wasm);
