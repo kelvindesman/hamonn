@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { promisify } from "node:util";
@@ -95,6 +95,8 @@ export class LocalFsHost implements GitHost {
         if (content === null) {
           rmSync(abs, { force: true });
         } else {
+          // a directory being replaced by a file
+          if (existsSync(abs) && statSync(abs).isDirectory()) rmSync(abs, { recursive: true, force: true });
           mkdirSync(dirname(abs), { recursive: true });
           writeFileSync(abs, content);
         }
