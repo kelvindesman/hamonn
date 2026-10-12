@@ -21,5 +21,8 @@
     "@hamonn/store-sqlite": "workspace:*",
     "@hono/node-server": "^1",
     "hono": "^4"
+  },
+  "exports": {
+    "./app": "./src/app.ts"
   }
 }

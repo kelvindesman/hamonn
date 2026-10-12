@@ -166,6 +166,10 @@ export function createApi(service: Service, opts: ApiOptions): Hono {
     c.json(await service.archive(c.req.param("p"), id(c, "id"))),
   );
 
+  app.post("/api/projects/:p/integration-remote", async (c) =>
+    c.json(await service.integrationRemote(c.req.param("p"))),
+  );
+
   app.post("/api/projects/:p/drain", async (c) => c.json(await service.drainQueue(c.req.param("p"))));
 
   app.get("/api/projects/:p/tasks/:t", async (c) =>

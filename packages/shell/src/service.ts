@@ -214,6 +214,13 @@ export function createService(deps: Deps) {
       });
     },
 
+    /** A 10-minute read-only remote for the integration repo, so a lane can `git fetch` + rebase. */
+    async integrationRemote(projectName: string): Promise<{ remote: string; branch: string; token: Token }> {
+      const project = await mustProject(projectName);
+      const token = await host.mintToken(project.repo, "read", 600);
+      return { remote: host.remoteUrl(project.repo, token), branch: project.integrationBranch, token };
+    },
+
     async mintLaneToken(projectName: string, laneId: number): Promise<{ remote: string; token: Token }> {
       const lane = await mustLane(projectName, laneId);
       if (lane.state === "LANDED" || lane.state === "ARCHIVED") {

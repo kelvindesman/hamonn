@@ -86,6 +86,8 @@ describe("routes", () => {
     expect(tokened.body.token.secret).toBeTruthy();
     const queued = await s.call("POST", "/api/projects/demo/lanes/1/land");
     expect(queued).toMatchObject({ status: 202, body: { state: "READY", queuePosition: 0 } });
+    const integration = await s.call("POST", "/api/projects/demo/integration-remote");
+    expect(integration.body).toMatchObject({ branch: "main" });
     const drained = await s.call("POST", "/api/projects/demo/drain");
     expect(drained.body[0].state).toBe("LANDED");
     expect((await s.call("GET", "/api/projects/demo/tasks/T-17")).body.rows).toHaveLength(1);

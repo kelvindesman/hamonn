@@ -244,6 +244,18 @@ describe("push → READY", () => {
   });
 });
 
+describe("integration remote", () => {
+  it("mints a short-lived read token for the integration repo", async () => {
+    const h = harness();
+    await project(h);
+    const r = await h.service.integrationRemote("demo");
+    expect(r.branch).toBe("main");
+    expect(r.remote).toContain("demo-app");
+    expect(h.host.minted.at(-1)).toMatchObject({ repo: "demo-app", scope: "read", ttl: 600 });
+    await expect(h.service.integrationRemote("nope")).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+});
+
 describe("tokens & archive", () => {
   it("rotates a lane token, revoking the previous one", async () => {
     const h = harness();
