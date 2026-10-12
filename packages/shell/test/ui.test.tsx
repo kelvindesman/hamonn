@@ -162,7 +162,11 @@ describe("ui", () => {
     const s = await scene();
     const r = await s.ui.request("/");
     expect(r.status).toBe(302);
-    await expect(s.ui.request("/p/nope")).resolves.toBeDefined();
+    const missing = await s.ui.request("/p/nope");
+    expect(missing.status).toBe(404);
+    expect(await missing.text()).toBe("NOT_FOUND: unknown project: nope");
+    expect((await s.ui.request("/t/demo/T-x")).status).toBe(404);
+    expect((await s.ui.request("/l/demo/99")).status).toBe(404);
   });
 
   it("describes every readiness reason in words", () => {

@@ -65,7 +65,7 @@ export type KernelSource = WebAssembly.Module | BufferSource;
 
 /**
  * Instantiate the kernel. Synchronous and idempotent: the wasm is initialised once per isolate.
- * In a Worker: `import wasm from "@hamonn/core/wasm"; const kernel = createKernel(wasm);`
+ * In a Worker: `import wasm from "@hamonn/core/hamonn_core_bg.wasm"; const kernel = createKernel(wasm);`
  */
 export function createKernel(source: KernelSource): Kernel {
   initSync({ module: source });

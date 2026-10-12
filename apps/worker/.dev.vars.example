@@ -1,0 +1,4 @@
+# Copy to .dev.vars for `wrangler dev`; set the same value in production with
+#   wrangler secret put HAMONN_ADMIN_KEY
+# Every write request (agents, the hamonn CLI, the board's buttons) must send it as a bearer token.
+HAMONN_ADMIN_KEY=change-me-to-a-long-random-string

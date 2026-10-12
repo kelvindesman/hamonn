@@ -1,6 +1,7 @@
 import type { CandidateRow, CheckResult, Lane, LaneState, Readiness, Reason } from "@hamonn/core";
 import { Hono } from "hono";
 import type { Child } from "hono/jsx";
+import { normalizeError } from "./errors.ts";
 import type { Board, Service } from "./service.ts";
 
 const CLIENT_JS = `
@@ -359,6 +360,11 @@ export function LaneDetail(props: {
 /** Server-rendered pages. htmx re-fetches the `?partial=1` fragment every 2 s. */
 export function createUi(service: Service): Hono {
   const ui = new Hono();
+
+  ui.onError((e, c) => {
+    const err = normalizeError(e);
+    return c.text(`${err.code}: ${err.message}`, err.status);
+  });
 
   ui.get("/", (c) => c.redirect("/p/demo"));
 

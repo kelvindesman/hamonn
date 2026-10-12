@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@hamonn/core": "workspace:*",
-    "@hamonn/shell": "workspace:*"
+    "@hamonn/shell": "workspace:*",
+    "@hamonn/store-sql": "workspace:*"
   },
   "devDependencies": {
     "@hamonn/contract": "workspace:*"

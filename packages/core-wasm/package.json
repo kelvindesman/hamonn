@@ -9,7 +9,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./node": "./src/node.ts",
-    "./wasm": "./pkg/hamonn_core_bg.wasm"
+    "./hamonn_core_bg.wasm": "./pkg/hamonn_core_bg.wasm"
   },
   "files": [
     "src",

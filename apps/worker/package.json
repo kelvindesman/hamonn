@@ -1,0 +1,45 @@
+{
+  "name": "@hamonn/worker",
+  "version": "0.1.0",
+  "private": false,
+  "description": "hamonn on Cloudflare Workers: Durable Objects + Queues + Artifacts",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "types": "wrangler types",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@hamonn/adapter-cloudflare-artifacts": "workspace:*",
+    "@hamonn/core": "workspace:*",
+    "@hamonn/gitwire-isomorphic": "workspace:*",
+    "@hamonn/shell": "workspace:*",
+    "@hamonn/store-sql": "workspace:*",
+    "hono": "^4",
+    "isomorphic-git": "^1.30.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4",
+    "wrangler": "^4"
+  },
+  "cloudflare": {
+    "label": "hamonn",
+    "bindings": {
+      "ARTIFACTS": {
+        "description": "Cloudflare Artifacts namespace that holds the project repos and one fork per lane."
+      },
+      "PROJECT": {
+        "description": "One ProjectDO per project: lanes, claims, checks and the serial landing queue (SQLite-backed)."
+      },
+      "REGISTRY": {
+        "description": "Maps fork repos back to lanes so Artifacts push events reach the right project."
+      },
+      "HAMONN_ADMIN_KEY": {
+        "description": "Bearer token required on every write request. Agents and the CLI send it; keep it secret."
+      }
+    }
+  }
+}
