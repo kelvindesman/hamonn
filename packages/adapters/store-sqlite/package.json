@@ -1,0 +1,22 @@
+{
+  "name": "@hamonn/store-sqlite",
+  "version": "0.1.0",
+  "description": "hamonn Store + Registry over node:sqlite (self-host)",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "@hamonn/core": "workspace:*",
+    "@hamonn/shell": "workspace:*"
+  },
+  "devDependencies": {
+    "@hamonn/contract": "workspace:*"
+  }
+}

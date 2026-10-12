@@ -30,6 +30,47 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.4)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
+  packages/adapters/contract:
+    dependencies:
+      '@hamonn/core':
+        specifier: workspace:*
+        version: link:../../core-wasm
+      '@hamonn/shell':
+        specifier: workspace:*
+        version: link:../../shell
+      vitest:
+        specifier: '*'
+        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.4)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
+
+  packages/adapters/gitwire-system-git:
+    dependencies:
+      '@hamonn/core':
+        specifier: workspace:*
+        version: link:../../core-wasm
+      '@hamonn/shell':
+        specifier: workspace:*
+        version: link:../../shell
+    devDependencies:
+      '@hamonn/adapter-local-fs':
+        specifier: workspace:*
+        version: link:../local-fs
+      '@hamonn/contract':
+        specifier: workspace:*
+        version: link:../contract
+
+  packages/adapters/local-fs:
+    dependencies:
+      '@hamonn/core':
+        specifier: workspace:*
+        version: link:../../core-wasm
+      '@hamonn/shell':
+        specifier: workspace:*
+        version: link:../../shell
+    devDependencies:
+      '@hamonn/contract':
+        specifier: workspace:*
+        version: link:../contract
+
   packages/adapters/store-memory:
     dependencies:
       '@hamonn/core':
@@ -38,6 +79,23 @@ importers:
       '@hamonn/shell':
         specifier: workspace:*
         version: link:../../shell
+    devDependencies:
+      '@hamonn/contract':
+        specifier: workspace:*
+        version: link:../contract
+
+  packages/adapters/store-sqlite:
+    dependencies:
+      '@hamonn/core':
+        specifier: workspace:*
+        version: link:../../core-wasm
+      '@hamonn/shell':
+        specifier: workspace:*
+        version: link:../../shell
+    devDependencies:
+      '@hamonn/contract':
+        specifier: workspace:*
+        version: link:../contract
 
   packages/core-wasm: {}
 

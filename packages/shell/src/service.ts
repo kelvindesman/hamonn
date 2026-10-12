@@ -79,6 +79,8 @@ export interface Board {
   project: Project;
   integrationHead: string | null;
   lanes: Record<LaneState, Lane[]>;
+  /** Why each lane is (not) ready, keyed by lane id. */
+  readiness: Record<number, Readiness>;
   queue: number[];
   events: Record<string, number>;
   recent: ProjectEvent[];
@@ -362,7 +364,12 @@ export function createService(deps: Deps) {
     async board(projectName: string): Promise<Board> {
       const project = await mustProject(projectName);
       const lanes = Object.fromEntries(STATES.map((s) => [s, [] as Lane[]])) as Record<LaneState, Lane[]>;
-      for (const l of await store.listLanes(projectName)) lanes[l.state].push(l);
+      const checks = await store.listChecks(projectName);
+      const readiness: Record<number, Readiness> = {};
+      for (const l of await store.listLanes(projectName)) {
+        lanes[l.state].push(l);
+        readiness[l.id] = kernel.evaluate(l, checks, project);
+      }
       const events: Record<string, number> = {};
       const all = await store.listEvents(projectName, 500);
       for (const e of all) events[e.kind] = (events[e.kind] ?? 0) + 1;
@@ -370,6 +377,7 @@ export function createService(deps: Deps) {
         project,
         integrationHead: await host.headSha(project.repo, project.integrationBranch),
         lanes,
+        readiness,
         queue: kernel.queueOrder(await store.listQueue(projectName)),
         events,
         recent: all.slice(0, 20),

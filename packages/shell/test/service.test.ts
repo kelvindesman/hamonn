@@ -465,6 +465,8 @@ describe("board", () => {
     expect(b.integrationHead).toBe("c1000000");
     expect(b.lanes.OPEN.map((l) => l.id)).toEqual([1]);
     expect(b.lanes.READY.map((l) => l.id)).toEqual([a]);
+    expect(b.readiness[a]?.ready).toBe(true);
+    expect(b.readiness[1]?.reasons[0]).toEqual({ code: "WRONG_STATE", state: "OPEN" });
     expect(b.queue).toEqual([a]);
     expect(b.events["lane.open"]).toBe(2);
     expect(b.recent.length).toBeGreaterThan(0);

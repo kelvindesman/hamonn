@@ -1,0 +1,20 @@
+{
+  "name": "@hamonn/contract",
+  "version": "0.1.0",
+  "description": "Contract test suites every hamonn GitHost / GitWire adapter must pass",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./git-http-server": "./src/git-http-server.ts"
+  },
+  "dependencies": {
+    "@hamonn/core": "workspace:*",
+    "@hamonn/shell": "workspace:*"
+  },
+  "peerDependencies": {
+    "vitest": "*"
+  }
+}

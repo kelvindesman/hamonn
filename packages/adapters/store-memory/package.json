@@ -12,5 +12,8 @@
   "dependencies": {
     "@hamonn/core": "workspace:*",
     "@hamonn/shell": "workspace:*"
+  },
+  "devDependencies": {
+    "@hamonn/contract": "workspace:*"
   }
 }
