@@ -153,6 +153,10 @@ pub struct CheckResult {
     pub status: CheckStatus,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
+    /// Lane head the check ran against. A check bound to a head only counts while the lane is
+    /// still at that head (so a re-push invalidates stale greens); unbound checks always count.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub head: Option<String>,
     pub at: i64,
 }
 

@@ -27,11 +27,12 @@ pub struct Readiness {
     pub reasons: Vec<Reason>,
 }
 
-/// Latest result (by `at`, later wins ties) of check `name` for `lane_id`.
-fn latest<'a>(checks: &'a [CheckResult], lane_id: u64, name: &str) -> Option<&'a CheckResult> {
+/// Latest result (by `at`, later wins ties) of check `name` valid for this lane's current head.
+pub(crate) fn latest<'a>(checks: &'a [CheckResult], lane: &Lane, name: &str) -> Option<&'a CheckResult> {
     checks
         .iter()
-        .filter(|c| c.lane_id == lane_id && c.name == name)
+        .filter(|c| c.lane_id == lane.id && c.name == name)
+        .filter(|c| c.head.is_none() || c.head == lane.head)
         .max_by_key(|c| c.at)
 }
 
@@ -46,7 +47,7 @@ pub fn evaluate(lane: &Lane, checks: &[CheckResult], project: &ProjectPolicy) ->
         reasons.push(Reason::NoPush);
     }
     for name in &project.required_checks {
-        match latest(checks, lane.id, name).map(|c| c.status) {
+        match latest(checks, lane, name).map(|c| c.status) {
             None => reasons.push(Reason::CheckMissing { name: name.clone() }),
             Some(CheckStatus::Fail) => reasons.push(Reason::CheckFailing { name: name.clone() }),
             Some(CheckStatus::Pending) => reasons.push(Reason::CheckPending { name: name.clone() }),
@@ -151,6 +152,7 @@ pub(crate) mod fixtures {
             name: name.into(),
             status,
             url: None,
+            head: None,
             at,
         }
     }
@@ -224,6 +226,20 @@ mod tests {
             check(2, "unit", CheckStatus::Fail, 3),
         ];
         assert!(evaluate(&l, &mixed, &project()).ready);
+    }
+
+    #[test]
+    fn checks_bound_to_an_old_head_do_not_count() {
+        let l = lane(1, LaneState::Pushed); // head "aaa"
+        let mut stale = check(1, "unit", CheckStatus::Pass, 5);
+        stale.head = Some("old".into());
+        assert_eq!(
+            evaluate(&l, &[stale], &project()).reasons,
+            vec![Reason::CheckMissing { name: "unit".into() }]
+        );
+        let mut fresh = check(1, "unit", CheckStatus::Pass, 5);
+        fresh.head = Some("aaa".into());
+        assert!(evaluate(&l, &[fresh], &project()).ready);
     }
 
     #[test]

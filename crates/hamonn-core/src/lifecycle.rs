@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::claims::{claims_overlap, drift, matches_any, normalize};
 use crate::domain::*;
 use crate::error::KernelError;
+use crate::evaluate::latest;
 use crate::state::{can_transition, transition};
 
 /// Lifetime of the short-lived credentials minted for a lane (seconds).
@@ -380,21 +381,17 @@ pub struct CandidateRow {
     pub score: i64,
 }
 
-fn check_counts(lane_id: LaneId, checks: &[CheckResult]) -> (usize, usize, usize) {
+fn check_counts(lane: &Lane, checks: &[CheckResult]) -> (usize, usize, usize) {
     let mut names: Vec<&str> = checks
         .iter()
-        .filter(|c| c.lane_id == lane_id)
+        .filter(|c| c.lane_id == lane.id)
         .map(|c| c.name.as_str())
         .collect();
     names.sort_unstable();
     names.dedup();
     let (mut pass, mut fail, mut pending) = (0, 0, 0);
     for name in names {
-        let latest = checks
-            .iter()
-            .filter(|c| c.lane_id == lane_id && c.name == name)
-            .max_by_key(|c| c.at);
-        match latest.map(|c| c.status) {
+        match latest(checks, lane, name).map(|c| c.status) {
             Some(CheckStatus::Pass) => pass += 1,
             Some(CheckStatus::Fail) => fail += 1,
             _ => pending += 1,
@@ -408,7 +405,7 @@ pub fn compare(lanes: &[Lane], checks: &[CheckResult]) -> Vec<CandidateRow> {
     let mut rows: Vec<CandidateRow> = lanes
         .iter()
         .map(|l| {
-            let (passed, failed, pending) = check_counts(l.id, checks);
+            let (passed, failed, pending) = check_counts(l, checks);
             let ledger_ok = l.ledger.intent && l.ledger.handoff;
             let preview = match l.merge_preview {
                 Some(MergePreview::Clean) => 5,

@@ -22,3 +22,6 @@ proptest = "1"
 [[bin]]
 name = "gen-vectors"
 path = "src/bin/gen-vectors.rs"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false

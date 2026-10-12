@@ -1,0 +1,8 @@
+{
+  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": { "includes": ["**", "!**/pkg", "!**/node_modules", "!**/coverage", "!crates", "!target", "!**/worker-configuration.d.ts"] },
+  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 110 },
+  "linter": { "enabled": true, "rules": { "recommended": true, "style": { "noNonNullAssertion": "off" } } },
+  "javascript": { "formatter": { "quoteStyle": "double", "semicolons": "always" } }
+}

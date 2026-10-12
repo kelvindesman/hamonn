@@ -1,0 +1,36 @@
+{
+  "name": "hamonn-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "hamonn: host-agnostic landing layer for concurrent agents",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "build:wasm": "wasm-pack build crates/hamonn-core --release --target web --out-dir ../../packages/core-wasm/pkg --out-name hamonn_core",
+    "vectors": "cargo run -q --bin gen-vectors",
+    "test:rust": "cargo test -q",
+    "cov:rust": "cargo llvm-cov --ignore-filename-regex 'src/(bin|wasm)' --fail-under-lines 100 --fail-under-functions 100",
+    "test": "vitest run --coverage",
+    "test:one": "vitest run",
+    "lint": "biome ci .",
+    "format": "biome check --write .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "check": "pnpm lint && pnpm typecheck && pnpm test:rust && pnpm test",
+    "dev": "pnpm --filter @hamonn/worker dev",
+    "deploy": "pnpm --filter @hamonn/worker deploy",
+    "prepare": "git config core.hooksPath .githooks || true"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@changesets/cli": "^3.0.3",
+    "@types/node": "^26.6.5",
+    "@vitest/coverage-v8": "^5.0.4",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.4"
+  }
+}
