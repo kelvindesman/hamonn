@@ -356,11 +356,19 @@ export function createService(deps: Deps) {
       return { ...plan, ...queued };
     },
 
-    async lane(projectName: string, laneId: number): Promise<LaneView & { checks: CheckResult[] }> {
+    async lane(
+      projectName: string,
+      laneId: number,
+    ): Promise<LaneView & { checks: CheckResult[]; integrationBranch: string }> {
       const project = await mustProject(projectName);
       const lane = await mustLane(projectName, laneId);
       const checks = await store.listChecks(projectName, laneId);
-      return { lane, checks, readiness: kernel.evaluate(lane, checks, project) };
+      return {
+        lane,
+        checks,
+        readiness: kernel.evaluate(lane, checks, project),
+        integrationBranch: project.integrationBranch,
+      };
     },
 
     async task(projectName: string, taskId: string): Promise<TaskView> {

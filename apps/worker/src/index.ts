@@ -1,4 +1,4 @@
-import { safeEqual } from "@hamonn/shell";
+import { landingPage, safeEqual } from "@hamonn/shell";
 import { Hono } from "hono";
 import { ProjectDO } from "./do/project.ts";
 import { RegistryDO } from "./do/registry.ts";
@@ -24,13 +24,9 @@ export function createWorkerApp(): Hono<{ Bindings: Env }> {
   app.get("/", async (c) => {
     const rows = (await (await registry(c.env).fetch(new Request("http://registry/projects"))).json()) as {
       name: string;
+      repo?: string;
     }[];
-    const items = rows
-      .map((r) => `<li><a href="/p/${encodeURIComponent(r.name)}">${r.name.replace(/[<>&"]/g, "")}</a></li>`)
-      .join("");
-    return c.html(
-      `<!doctype html><meta charset="utf-8"><title>hamonn</title><body style="font-family:monospace;background:#020617;color:#e2e8f0;padding:2rem"><h1>hamonn</h1><ul>${items || "<li>no projects yet: POST /api/projects</li>"}</ul>`,
-    );
+    return c.html(landingPage(rows));
   });
 
   // Create a project repo in this deployment's Artifacts namespace (the binding is the only credential).
