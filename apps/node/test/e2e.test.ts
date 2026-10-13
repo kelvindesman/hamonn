@@ -246,7 +246,7 @@ describe("hamonn on node + local-fs: the full agent story over real git", () => 
     expect(board.integrationHead).toBe(head);
     const page = await built.app.request("/p/demo");
     expect(page.status).toBe(200);
-    expect(await page.text()).toContain("LANDED (2)");
+    expect(await page.text()).toContain('data-col="LANDED" aria-label="Landed: 2"');
   }, 120_000);
 
   it("rejects writes without the admin key", async () => {
