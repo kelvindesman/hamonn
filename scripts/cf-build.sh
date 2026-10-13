@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build command for Cloudflare Workers Builds (dashboard: Settings -> Build -> Build command).
 # The build image has Node + pnpm but no Rust, so install a minimal toolchain, then build the wasm
-# kernel the same way CI does. Deploy command: `pnpm --filter @hamonn/worker deploy`.
+# kernel the same way CI does. Deploy command: `pnpm --filter @hamonn/worker run deploy` (plain `pnpm deploy` is a pnpm builtin).
 set -euo pipefail
 
 if ! command -v cargo >/dev/null 2>&1; then

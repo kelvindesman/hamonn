@@ -141,7 +141,9 @@ export class ArtifactsHost implements GitHost {
       const treeOf = async (sha: string | null): Promise<string | null> => {
         if (!sha) return null;
         const c = await h.readCommit(sha);
-        if (!c?.tree) throw new Error(`commit ${sha} not found in ${repo.name}`);
+        if (!c) throw new Error(`commit ${sha} not found in ${repo.name}`);
+        const fields = Object.keys(c).join(",");
+        if (!c.tree) throw new Error(`commit ${sha} in ${repo.name} has no tree (fields: ${fields})`);
         return c.tree;
       };
       const cache = new Map<string, Promise<ArtifactsTreeEntry[]>>();
