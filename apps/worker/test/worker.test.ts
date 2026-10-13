@@ -66,6 +66,34 @@ describe("worker front", () => {
     expect((await app.request("/l/demo/1", {}, h.env)).status).toBe(404);
   });
 
+  it("creates project repos in the Artifacts namespace, admin only", async () => {
+    const h = makeEnv();
+    const app = createWorkerApp();
+    const post = (body: unknown, init: RequestInit = authed("POST", body)) =>
+      app.request("/api/admin/repos", init, h.env);
+    expect((await post({ name: "r" }, { method: "POST", body: "{}" })).status).toBe(401);
+    expect((await post(undefined, { ...authed("POST"), body: "nope" })).status).toBe(400);
+    expect((await post({ name: "-bad" })).status).toBe(400);
+    expect((await post({ name: "demo-app" })).status).toBe(501);
+    const calls: unknown[] = [];
+    h.env.ARTIFACTS = {
+      ...h.env.ARTIFACTS,
+      create: async (name, opts) => {
+        calls.push([name, opts]);
+        return { name, remote: `https://acct.artifacts.cloudflare.net/git/hamonn/${name}.git`, token: "t" };
+      },
+    };
+    const res = await post({ name: "demo-app" });
+    expect(res.status).toBe(201);
+    expect(await res.json()).toEqual({
+      name: "demo-app",
+      remote: "https://acct.artifacts.cloudflare.net/git/hamonn/demo-app.git",
+      defaultBranch: "main",
+      token: "t",
+    });
+    expect(calls).toEqual([["demo-app", { setDefaultBranch: "main", description: "hamonn project repo" }]]);
+  });
+
   it("exports fetch/queue handlers and DO classes", async () => {
     const h = makeEnv();
     const res = await worker.fetch(new Request("http://x/healthz"), h.env, {});
@@ -194,6 +222,33 @@ describe("queue consumer", () => {
       lane: { state: string; head: string };
     };
     expect(view.lane).toMatchObject({ state: "PUSHED", head: sha });
+  });
+
+  it("ignores pushes from other Artifacts namespaces when one is configured", async () => {
+    const h = makeEnv();
+    h.env.HAMONN_ARTIFACTS_NAMESPACE = "hamonn";
+    const { app, lane, sha } = await laneWithPush(h);
+    const acked: string[] = [];
+    const push = (namespace: string) => ({
+      body: {
+        type: "cf.artifacts.repo.pushed",
+        source: { namespace, repoName: lane.repo.name },
+        payload: { ref: "refs/heads/main", after: sha },
+      },
+      ack: () => acked.push(`ack:${namespace}`),
+      retry: () => acked.push(`retry:${namespace}`),
+    });
+    await handleBatch({ messages: [push("other")] }, h.env);
+    const before = (await (await app.request(`/api/projects/demo/lanes/${lane.id}`, {}, h.env)).json()) as {
+      lane: { state: string };
+    };
+    expect(before.lane.state).toBe("OPEN");
+    await handleBatch({ messages: [push("hamonn")] }, h.env);
+    const after = (await (await app.request(`/api/projects/demo/lanes/${lane.id}`, {}, h.env)).json()) as {
+      lane: { state: string; head: string };
+    };
+    expect(after.lane).toMatchObject({ state: "PUSHED", head: sha });
+    expect(acked).toEqual(["ack:other", "ack:hamonn"]);
   });
 
   it("acks pushes for lanes that can no longer accept them, retries real failures", async () => {

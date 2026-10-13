@@ -47,6 +47,11 @@ export interface ArtifactsRepoHandle {
 }
 export interface ArtifactsBinding {
   get(name: string): Promise<ArtifactsRepoHandle>;
+  /** Namespace-level create; returns the git remote and an initial write token. */
+  create?(
+    name: string,
+    opts?: { description?: string; readOnly?: boolean; setDefaultBranch?: string },
+  ): Promise<{ name: string; remote: string; defaultBranch?: string; token?: string }>;
 }
 
 const SHA_RE = /^[0-9a-f]{40}$/;

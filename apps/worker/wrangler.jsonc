@@ -5,7 +5,7 @@
   "compatibility_date": "2026-10-12",
   "compatibility_flags": ["nodejs_compat"],
   "rules": [{ "type": "CompiledWasm", "globs": ["**/*.wasm"], "fallthrough": true }],
-  "artifacts": [{ "binding": "ARTIFACTS", "namespace": "default" }],
+  "artifacts": [{ "binding": "ARTIFACTS", "namespace": "hamonn" }],
   "durable_objects": {
     "bindings": [
       { "name": "PROJECT", "class_name": "ProjectDO" },
@@ -15,6 +15,6 @@
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ProjectDO", "RegistryDO"] }],
   "queues": { "consumers": [{ "queue": "hamonn-events", "max_batch_size": 10, "max_retries": 3 }] },
   "limits": { "cpu_ms": 300000 },
-  "vars": { "HAMONN_PUBLIC_URL": "" },
+  "vars": { "HAMONN_PUBLIC_URL": "", "HAMONN_ARTIFACTS_NAMESPACE": "hamonn" },
   "observability": { "enabled": true }
 }

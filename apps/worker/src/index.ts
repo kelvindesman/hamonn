@@ -1,3 +1,4 @@
+import { safeEqual } from "@hamonn/shell";
 import { Hono } from "hono";
 import { ProjectDO } from "./do/project.ts";
 import { RegistryDO } from "./do/registry.ts";
@@ -29,6 +30,37 @@ export function createWorkerApp(): Hono<{ Bindings: Env }> {
       .join("");
     return c.html(
       `<!doctype html><meta charset="utf-8"><title>hamonn</title><body style="font-family:monospace;background:#020617;color:#e2e8f0;padding:2rem"><h1>hamonn</h1><ul>${items || "<li>no projects yet: POST /api/projects</li>"}</ul>`,
+    );
+  });
+
+  // Create a project repo in this deployment's Artifacts namespace (the binding is the only credential).
+  app.post("/api/admin/repos", async (c) => {
+    const given = c.req.header("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+    if (!c.env.HAMONN_ADMIN_KEY || !safeEqual(given, c.env.HAMONN_ADMIN_KEY)) {
+      return c.json({ error: { code: "UNAUTHORIZED", message: "missing or invalid bearer token" } }, 401);
+    }
+    let name: unknown;
+    try {
+      name = ((await c.req.json()) as { name?: unknown }).name;
+    } catch {
+      name = undefined;
+    }
+    if (typeof name !== "string" || !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(name)) {
+      return c.json({ error: { code: "BAD_REQUEST", message: "valid repo name is required" } }, 400);
+    }
+    if (!c.env.ARTIFACTS.create) {
+      return c.json(
+        { error: { code: "NOT_SUPPORTED", message: "Artifacts binding cannot create repos" } },
+        501,
+      );
+    }
+    const r = await c.env.ARTIFACTS.create(name, {
+      setDefaultBranch: "main",
+      description: "hamonn project repo",
+    });
+    return c.json(
+      { name: r.name, remote: r.remote, defaultBranch: r.defaultBranch ?? "main", token: r.token },
+      201,
     );
   });
 

@@ -48,12 +48,17 @@ export async function forwardPush(env: Env, event: PushEvent): Promise<{ ignored
   return (await res.json()) as { ignored: boolean };
 }
 
-/** Queue consumer: `cf.artifacts.repo.pushed` -> the owning ProjectDO. Everything else is acknowledged. */
+/**
+ * Queue consumer: `cf.artifacts.repo.pushed` -> the owning ProjectDO. Everything else is acknowledged,
+ * including pushes from other Artifacts namespaces in the same account.
+ */
 export async function handleBatch(batch: { messages: QueueMessage[] }, env: Env): Promise<void> {
   for (const msg of batch.messages) {
     const e = msg.body as ArtifactsEvent;
     try {
-      if (e?.type === "cf.artifacts.repo.pushed" && e.source?.repoName && e.payload?.after) {
+      const ns = env.HAMONN_ARTIFACTS_NAMESPACE;
+      const ours = !ns || e?.source?.namespace === ns;
+      if (ours && e?.type === "cf.artifacts.repo.pushed" && e.source?.repoName && e.payload?.after) {
         await forwardPush(env, {
           repoName: e.source.repoName,
           ref: e.payload.ref,

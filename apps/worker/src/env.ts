@@ -12,6 +12,8 @@ export interface Env {
   REGISTRY: DoNamespaceLike;
   HAMONN_ADMIN_KEY: string;
   HAMONN_PUBLIC_URL?: string;
+  /** Artifacts namespace this deployment owns; push events from other namespaces are ignored. */
+  HAMONN_ARTIFACTS_NAMESPACE?: string;
 }
 
 /** The slice of `DurableObjectState` hamonn uses. */
