@@ -2,7 +2,8 @@
 # Scene: the agent's session dies. A brand-new checkout of the lane carries the context in the repo itself.
 . "$(dirname "$0")/lib.sh"
 LANE="${1:?usage: resume.sh <laneId>}"
-REMOTE="$(curl -fsS "$HAMONN_URL/api/projects/$HAMONN_PROJECT/lanes/$LANE" | node -p 'JSON.parse(require("fs").readFileSync(0,"utf8")).lane.repo.remote')"
+# A fresh session asks the coordinator for a new lane credential (the old one is revoked).
+REMOTE="$(owner "/api/projects/$HAMONN_PROJECT/lanes/$LANE/token" | node -p 'JSON.parse(require("fs").readFileSync(0,"utf8")).remote')"
 D="$WORK/agent-a-resumed"; rm -rf "$D"
 say "A's session is gone. A fresh agent resumes from the lane's repo alone"
 git clone -q "$REMOTE" "$D"; cd "$D"

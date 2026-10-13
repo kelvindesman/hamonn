@@ -31,7 +31,7 @@ else
   git -c http.extraHeader="Authorization: Bearer $TOKEN" push -q "$REMOTE" main
 fi
 
-say "register project 'demo' (gated: wrangler.jsonc, src/db/**; required check: unit)"
+say "register project '$HAMONN_PROJECT' (gated: wrangler.jsonc, src/db/**; required check: unit)"
 curl -fsS -X POST "$HAMONN_URL/api/projects" -H "authorization: Bearer $HAMONN_KEY" -H 'content-type: application/json' \
-  -d "{\"name\":\"demo\",\"repo\":{\"name\":\"${REPO_NAME:-demo-app}\",\"remote\":\"$REMOTE\"},\"gatedPaths\":[\"wrangler.jsonc\",\"src/db/**\"],\"requiredChecks\":[\"unit\"]}"; echo
-echo "board: $HAMONN_URL/p/demo"
+  -d "{\"name\":\"$HAMONN_PROJECT\",\"repo\":{\"name\":\"${REPO_NAME:-demo-app}\",\"remote\":\"$REMOTE\"},\"gatedPaths\":[\"wrangler.jsonc\",\"src/db/**\"],\"requiredChecks\":[\"unit\"]}"; echo
+echo "board: $HAMONN_URL/p/$HAMONN_PROJECT"

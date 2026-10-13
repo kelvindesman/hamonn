@@ -21,7 +21,7 @@ say()    { printf '\n\033[1;32m▶ %s\033[0m\n' "$*"; }
 # PAUSE=1: wait for Enter at each step (the recorder feeds the Enter after a dwell so viewers can read).
 pause()  { if [ -n "${PAUSE:-}" ]; then printf '  \033[2m⏎\033[0m\n' >&2; read -r _; fi; }
 # Owner-only actions (the human with the admin key), e.g. signing a gated path.
-owner()  { [ -n "${DEMO_ECHO:-}" ] && printf '\033[35m$ (owner) POST %s\033[0m\n' "$1"; curl -fsS -X POST -H "authorization: Bearer $HAMONN_KEY" -H 'content-type: application/json' "$HAMONN_URL$1" ${2:+-d "$2"}; }
+owner()  { [ -n "${DEMO_ECHO:-}" ] && printf '\033[35m$ (owner) POST %s\033[0m\n' "$1" >&2; curl -fsS -X POST -H "authorization: Bearer $HAMONN_KEY" -H 'content-type: application/json' "$HAMONN_URL$1" ${2:+-d "$2"}; }
 board()  { curl -fsS "$HAMONN_URL/api/projects/$HAMONN_PROJECT" | node -e '
   let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const b=JSON.parse(s);
   console.log("main @",String(b.integrationHead).slice(0,7),"| queue:",b.queue.join(",")||"∅");
