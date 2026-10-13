@@ -12,11 +12,16 @@ WORK="${WORK:-${TMPDIR:-/tmp}/hamonn-demo}"
 export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-demo-agent}" GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-agent@example.invalid}"
 export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME" GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 
-hamonn() { "$DEMO_ROOT/node_modules/.bin/tsx" "$DEMO_ROOT/apps/cli/src/bin.ts" "$@"; }
+# DEMO_ECHO=1 prints each command first (used by the recorded video so viewers can follow along).
+hamonn() {
+  [ -n "${DEMO_ECHO:-}" ] && printf '\033[36m$ hamonn %s\033[0m\n' "$*"
+  "$DEMO_ROOT/node_modules/.bin/tsx" "$DEMO_ROOT/apps/cli/src/bin.ts" "$@"
+}
 say()    { printf '\n\033[1;32m▶ %s\033[0m\n' "$*"; }
-pause()  { if [ -n "${PAUSE:-}" ]; then read -r -p "  ⏎ " _; fi; }
+# PAUSE=1: wait for Enter at each step (the recorder feeds the Enter after a dwell so viewers can read).
+pause()  { if [ -n "${PAUSE:-}" ]; then printf '  \033[2m⏎\033[0m\n' >&2; read -r _; fi; }
 # Owner-only actions (the human with the admin key), e.g. signing a gated path.
-owner()  { curl -fsS -X POST -H "authorization: Bearer $HAMONN_KEY" -H 'content-type: application/json' "$HAMONN_URL$1" ${2:+-d "$2"}; }
+owner()  { [ -n "${DEMO_ECHO:-}" ] && printf '\033[35m$ (owner) POST %s\033[0m\n' "$1"; curl -fsS -X POST -H "authorization: Bearer $HAMONN_KEY" -H 'content-type: application/json' "$HAMONN_URL$1" ${2:+-d "$2"}; }
 board()  { curl -fsS "$HAMONN_URL/api/projects/$HAMONN_PROJECT" | node -e '
   let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const b=JSON.parse(s);
   console.log("main @",String(b.integrationHead).slice(0,7),"| queue:",b.queue.join(",")||"∅");
