@@ -5,6 +5,7 @@
     "includes": [
       "**",
       "!**/pkg",
+      "!demo/record/input.css",
       "!**/node_modules",
       "!**/coverage",
       "!crates",

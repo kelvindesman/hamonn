@@ -1,0 +1,55 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>hamonn self demo</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #020617; color: #e2e8f0; font: 14px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; }
+  #bar { height: 34px; display: flex; align-items: center; gap: 14px; padding: 0 14px; background: #0b1220; border-bottom: 1px solid #1e293b; }
+  #bar b { color: #34d399; letter-spacing: .04em; }
+  #bar span { color: #64748b; }
+  #main { display: flex; height: calc(100% - 34px - 74px); }
+  #left { flex: 0 0 68%; overflow: hidden; border-right: 1px solid #1e293b; position: relative; }
+  #left h3, #right h3 { margin: 0; padding: 4px 10px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #64748b; background: #0b1220; }
+  /* render the board at its natural desktop width, then scale it to fit the pane so every column is visible */
+  iframe { width: 1200px; height: calc((100vh - 34px - 74px - 22px) / .725); border: 0; background: #020617; transform: scale(.725); transform-origin: 0 0; }
+  #right { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  #term { flex: 1; margin: 0; padding: 8px 10px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; font-size: 12px; background: #050b18; }
+  #termin { white-space: pre-wrap; word-break: break-all; }
+  .cmd { color: #67e8f9; } .own { color: #f0abfc; } .say { color: #34d399; font-weight: 700; } .warn { color: #fbbf24; } .bad { color: #f87171; } .ok { color: #86efac; }
+  #cap { height: 74px; padding: 10px 18px; background: #0b1220; border-top: 1px solid #1e293b; display: flex; flex-direction: column; justify-content: center; }
+  #cap .t { font-size: 20px; font-weight: 700; color: #f8fafc; } #cap .s { margin-top: 2px; color: #94a3b8; font-size: 13px; }
+  #card { position: absolute; inset: 0; z-index: 5; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px; background: radial-gradient(circle at 30% 20%, #0f2a22, #020617 60%); }
+  #card h1 { margin: 0 0 14px; font-size: 54px; color: #34d399; letter-spacing: .02em; } #card p { margin: 6px 0; font-size: 20px; color: #cbd5e1; max-width: 900px; } #card small { color: #64748b; font-size: 14px; margin-top: 22px; }
+</style>
+<div id="bar"><b>hamonn</b><span>self demo</span><span style="margin-left:auto" id="clock"></span></div>
+<div id="card"><h1 id="ch">hamonn</h1><div id="cb"></div><small id="cs"></small></div>
+<div id="main">
+  <div id="left"><h3>board &mdash; what the coordinator sees</h3><iframe id="f" title="hamonn board" src="about:blank"></iframe></div>
+  <div id="right"><h3>agents &mdash; terminal</h3><div id="term"><div id="termin"></div></div></div>
+</div>
+<div id="cap"><div class="t" id="ct"></div><div class="s" id="cs2"></div></div>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+  const cls = (l) => l.startsWith("$ (owner)") ? "own" : l.startsWith("$ ") ? "cmd" : l.startsWith("▶") ? "say"
+    : /⚠|BEHIND|drift|DRIFT|unsigned|needs sign/.test(l) ? "warn" : /✗|FAILED|failed|ERR/.test(l) ? "bad" : /LANDED|✓|ready to land|signed|READY/.test(l) ? "ok" : "";
+  let frame = "", rev = -1;
+  async function tick() {
+    try {
+      const s = await (await fetch("/state", { cache: "no-store" })).json();
+      if (s.rev !== rev) {
+        rev = s.rev;
+        if (s.frame !== frame) { frame = s.frame; $("f").src = s.frame; }
+        $("ct").textContent = s.caption; $("cs2").textContent = s.sub || "";
+        const t = $("termin");
+        t.innerHTML = s.log.slice(-60).map((l) => `<span class="${cls(l)}">${esc(l)}</span>`).join("\n");
+        const c = $("card");
+        if (s.card) { c.style.display = "flex"; $("ch").textContent = s.card.title; $("cb").innerHTML = s.card.lines.map((x) => `<p>${esc(x)}</p>`).join(""); $("cs").textContent = s.card.small || ""; }
+        else c.style.display = "none";
+      }
+    } catch {}
+  }
+  setInterval(tick, 250); tick();
+  setInterval(() => { $("clock").textContent = `${new Date().toISOString().slice(11, 19)}Z`; }, 1000);
+</script>

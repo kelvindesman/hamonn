@@ -11,3 +11,4 @@ packages/core-wasm/pkg-node/
 .lane/lane.json
 hamonn-data/
 apps/worker/dist/
+demo-out/

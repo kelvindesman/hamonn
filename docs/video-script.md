@@ -17,3 +17,6 @@ Setup: board open at `/p/demo`, terminal split into A / B / C / owner. Repo seed
 
 Honesty checklist before recording: say which adapters were live-tested (local-fs, workerd landing) and which were fixture-tested
 (github) or awaiting a first live run (Artifacts), matching `docs/adapters.md`.
+
+## Automated version
+`pnpm demo:video` (Docker) records a captioned ~100 s self-demo with no voice-over: see `demo/record/README.md`.

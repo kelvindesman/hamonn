@@ -1,0 +1,9 @@
+.git
+**/node_modules
+target
+**/dist
+coverage
+demo-out
+hamonn-data
+apps/worker/.dev.vars
+.wrangler

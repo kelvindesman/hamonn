@@ -1,0 +1,16 @@
+{
+  "name": "@hamonn/demo-recorder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Records hamonn's self demo (board + terminal) to a .webm with Playwright; runs in Docker",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "record": "node record.mjs"
+  },
+  "dependencies": {
+    "htmx.org": "2.0.4",
+    "playwright": "1.56.1",
+    "tailwindcss": "3.4.16"
+  }
+}
