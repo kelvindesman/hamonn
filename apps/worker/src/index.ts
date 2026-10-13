@@ -29,34 +29,6 @@ export function createWorkerApp(): Hono<{ Bindings: Env }> {
     return c.html(landingPage(rows));
   });
 
-  // TEMPORARY live probe of raw Artifacts binding output (removed after the first live run).
-  app.get("/api/admin/probe", async (c) => {
-    const given = c.req.header("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
-    if (!c.env.HAMONN_ADMIN_KEY || !safeEqual(given, c.env.HAMONN_ADMIN_KEY)) return c.text("no", 401);
-    const out: Record<string, unknown> = {};
-    const sha = c.req.query("sha") ?? "";
-    for (const repo of (c.req.query("repos") ?? "").split(",")) {
-      const h = await c.env.ARTIFACTS.get(repo);
-      const r: Record<string, unknown> = {};
-      const run = async (k: string, f: () => Promise<unknown>) => {
-        try {
-          r[k] = await f();
-        } catch (e) {
-          r[k] = `ERR ${String(e)}`;
-        }
-      };
-      await run("info", () => h.info());
-      await run("logMain", () => h.log({ ref: "main", limit: 3 }));
-      await run("logSha", () => h.log({ ref: sha, limit: 2 }));
-      await run("readCommit", () => h.readCommit(sha));
-      await run("readTree", async () =>
-        h.readTree(((await h.readCommit(sha)) as { treeHash: string }).treeHash),
-      );
-      out[repo] = r;
-    }
-    return c.json(out);
-  });
-
   // Create a project repo in this deployment's Artifacts namespace (the binding is the only credential).
   app.post("/api/admin/repos", async (c) => {
     const given = c.req.header("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
