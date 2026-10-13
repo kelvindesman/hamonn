@@ -24,7 +24,8 @@
     "deploy": "pnpm --filter @hamonn/worker deploy",
     "prepare": "lefthook install || true",
     "repo:map": "tsx scripts/repo-map.ts",
-    "changeset": "changeset"
+    "changeset": "changeset",
+    "demo:video": "docker build -t hamonn-demo . && docker run --rm --init --ipc=host -v \"$PWD/demo-out:/out\" hamonn-demo"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",

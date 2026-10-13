@@ -37,7 +37,7 @@ bash demo/seed.sh
 bash demo/agent-a.sh && bash demo/agent-c.sh   # C sees the overlap hint with A
 LAND=1 bash demo/agent-b.sh                    # drift + gate flagged → peer lands first → BEHIND → rebase → LANDED
 ```
-Full walkthrough: [demo/run-demo.md](demo/run-demo.md). The same flow runs as an automated test:
+Full walkthrough: [demo/run-demo.md](demo/run-demo.md). Prefer to watch? `pnpm demo:video` records a captioned self-demo in Docker ([how](demo/record/README.md)). The same flow runs as an automated test:
 `apps/node/test/e2e.test.ts` (three agents, real git, no mocks).
 
 ## The agent's view

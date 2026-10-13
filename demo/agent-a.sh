@@ -13,4 +13,4 @@ hamonn handoff "state: feed returns items
 next: wire into src/index.ts after landing"
 hamonn checks unit=pass; pause
 hamonn status
-[ -n "${LAND:-}" ] && { say "A: land"; hamonn land; }
+if [ -n "${LAND:-}" ]; then say "A: land"; hamonn land; fi

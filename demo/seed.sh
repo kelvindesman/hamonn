@@ -19,7 +19,7 @@ git add -A && git commit -q -m "seed demo-app"
 
 if [ "$MODE" = "local" ]; then
   REPO="${HAMONN_ROOT:-./hamonn-data/repos}/demo-app.git"; REPO="$(cd "$(dirname "$REPO")" 2>/dev/null && pwd || (mkdir -p "$(dirname "$REPO")" && cd "$(dirname "$REPO")" && pwd))/demo-app.git"
-  rm -rf "$REPO"; git init -q --bare -b main "$REPO"; git push -q "$REPO" main
+  rm -rf "$REPO"; git init -q --bare -b main "$REPO"; git push -q "$REPO" main 2>/dev/null
   REMOTE="$REPO"
 else
   (cd "$DEMO_ROOT/apps/worker" && npx wrangler artifacts repos create demo-app --namespace default --default-branch main) | tee "$WORK/artifacts-create.txt"
