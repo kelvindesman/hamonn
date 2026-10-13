@@ -139,10 +139,19 @@ describe("artifacts specifics", () => {
 
 describe("changedPaths diagnostics", () => {
   it("names the fields when a commit comes back without a tree", async () => {
-    const handle = { readCommit: async () => ({ hash: "a".repeat(40), treeHash: "t" }) };
+    const handle = { readCommit: async () => ({ hash: "a".repeat(40), message: "m" }) };
     const host = new ArtifactsHost({ get: async () => handle } as never);
     await expect(host.changedPaths({ name: "r", remote: "" }, null, "a".repeat(40))).rejects.toThrow(
-      /has no tree \(fields: hash,treeHash\)/,
+      /has no tree \(fields: hash,message\)/,
     );
+  });
+
+  it("accepts the older `tree` field", async () => {
+    const handle = {
+      readCommit: async () => ({ hash: "a".repeat(40), tree: "t" }),
+      readTree: async () => [{ name: "f", type: "blob", hash: "b".repeat(40) }],
+    };
+    const host = new ArtifactsHost({ get: async () => handle } as never);
+    expect(await host.changedPaths({ name: "r", remote: "" }, null, "a".repeat(40))).toEqual(["f"]);
   });
 });

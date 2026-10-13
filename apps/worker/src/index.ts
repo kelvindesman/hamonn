@@ -49,6 +49,9 @@ export function createWorkerApp(): Hono<{ Bindings: Env }> {
       await run("logMain", () => h.log({ ref: "main", limit: 3 }));
       await run("logSha", () => h.log({ ref: sha, limit: 2 }));
       await run("readCommit", () => h.readCommit(sha));
+      await run("readTree", async () =>
+        h.readTree(((await h.readCommit(sha)) as { treeHash: string }).treeHash),
+      );
       out[repo] = r;
     }
     return c.json(out);

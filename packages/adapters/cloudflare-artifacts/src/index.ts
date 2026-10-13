@@ -10,6 +10,8 @@ export interface ArtifactsCommit {
   hash?: string;
   oid?: string;
   sha?: string;
+  /** The live binding returns `treeHash`; `tree` kept for older shapes. */
+  treeHash?: string;
   tree?: string;
   parents?: string[];
 }
@@ -143,8 +145,9 @@ export class ArtifactsHost implements GitHost {
         const c = await h.readCommit(sha);
         if (!c) throw new Error(`commit ${sha} not found in ${repo.name}`);
         const fields = Object.keys(c).join(",");
-        if (!c.tree) throw new Error(`commit ${sha} in ${repo.name} has no tree (fields: ${fields})`);
-        return c.tree;
+        const tree = c.treeHash ?? c.tree;
+        if (!tree) throw new Error(`commit ${sha} in ${repo.name} has no tree (fields: ${fields})`);
+        return tree;
       };
       const cache = new Map<string, Promise<ArtifactsTreeEntry[]>>();
       const entries = (hash: string | null): Promise<ArtifactsTreeEntry[]> => {

@@ -87,7 +87,7 @@ export class FakeArtifacts implements ArtifactsBinding {
       async readCommit(hash) {
         try {
           const tree = self.git(name, "rev-parse", `${hash}^{tree}`).trim();
-          return { hash, tree };
+          return { hash, treeHash: tree };
         } catch {
           return null;
         }
