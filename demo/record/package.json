@@ -1,0 +1,12 @@
+{
+  "name": "hamonn-demo-recorder",
+  "private": true,
+  "type": "module",
+  "description": "Records the hamonn demo against a live deployment (see README.md).",
+  "scripts": {
+    "record": "node record.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.56.1"
+  }
+}

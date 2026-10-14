@@ -15,5 +15,7 @@ Setup: board open at `/p/demo`, terminal split into A / B / C / owner. Repo seed
 | 6:15 | Architecture | "Rust kernel, TypeScript shell, ports and adapters. Same core on Cloudflare Artifacts, GitHub, or a laptop." | `docs/architecture.md`; 100% kernel coverage; Node e2e |
 | 6:45 | Limits + call to action | "Beta Artifacts, isomorphic-git bounds, claims are declared not enforced — all in the README." | repo link, Deploy button |
 
-Honesty checklist before recording: say which adapters were live-tested (local-fs, workerd landing) and which were fixture-tested
-(github) or awaiting a first live run (Artifacts), matching `docs/adapters.md`.
+Honesty checklist before recording: say which adapters were live-tested (local-fs, workerd landing, Cloudflare Artifacts) and
+which were fixture-tested (github), matching `docs/adapters.md`.
+
+Recording: `demo/record/README.md` films this script against the live deployment (silent; voice over with `scenes.txt`).

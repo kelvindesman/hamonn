@@ -1,0 +1,78 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>hamonn demo</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #12161f; --surface: #191e29; --raise: #202634; --line: #2a3140;
+    --ink: #e9ecf2; --ink-2: #b4bccb; --ink-3: #8e97aa;
+    --signal: #f4b740; --alert: #ff8f80; --cmd: #9dbcff; --own: #d7b4ff;
+    --sans: Seravek, "Gill Sans Nova", Ubuntu, Calibri, system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 16px/1.45 var(--sans); overflow: hidden; }
+  #bar { height: 44px; display: flex; align-items: center; gap: 16px; padding: 0 24px; border-bottom: 1px solid var(--line); background: var(--surface); }
+  #bar b { font-weight: 650; letter-spacing: .01em; }
+  #bar .mark { width: 10px; height: 10px; background: var(--signal); border-radius: 2px; }
+  #bar span { color: var(--ink-3); font-size: 14px; }
+  #bar #url { margin-left: auto; font-family: var(--mono); font-size: 13px; }
+  #main { display: flex; height: calc(100% - 44px - 104px); }
+  #left { flex: 0 0 64%; overflow: hidden; border-right: 1px solid var(--line); position: relative; display: flex; flex-direction: column; }
+  .lbl { margin: 0; padding: 8px 16px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--line); }
+  #fw { flex: 1; position: relative; overflow: hidden; }
+  iframe { position: absolute; top: 0; left: 0; border: 0; background: var(--bg); transform-origin: 0 0; }
+  #right { flex: 1; min-width: 0; display: flex; flex-direction: column; background: #0d1017; }
+  #term { flex: 1; margin: 0; padding: 12px 16px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; font: 14px/1.5 var(--mono); }
+  #termin { white-space: pre-wrap; word-break: break-word; color: var(--ink-2); }
+  .cmd { color: var(--cmd); } .own { color: var(--own); } .say { color: var(--ink); font-weight: 700; font-family: var(--sans); font-size: 16px; }
+  .warn { color: var(--alert); } .ok { color: var(--signal); }
+  #cap { height: 104px; padding: 16px 28px; border-top: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; justify-content: center; }
+  #cap .t { font-size: 28px; font-weight: 650; letter-spacing: -.01em; }
+  #cap .s { margin-top: 4px; color: var(--ink-3); font-size: 18px; }
+  #card { position: absolute; inset: 0; z-index: 5; display: none; flex-direction: column; justify-content: center; padding: 0 160px; background: var(--bg); }
+  #card h1 { margin: 0 0 28px; font-size: 64px; font-weight: 650; letter-spacing: -.02em; display: flex; align-items: center; gap: 20px; }
+  #card h1::before { content: ""; width: 22px; height: 22px; background: var(--signal); border-radius: 4px; flex: none; }
+  #card p { margin: 10px 0; font-size: 28px; color: var(--ink-2); max-width: 1400px; }
+  #card p b { color: var(--ink); font-weight: 650; }
+  #card p code { font: 24px var(--mono); color: var(--signal); }
+  #card small { margin-top: 40px; color: var(--ink-3); font: 20px var(--mono); }
+</style>
+<div id="bar"><span class="mark"></span><b>hamonn</b><span>landing layer for concurrent agents · live on Cloudflare Workers + Artifacts</span><span id="url"></span></div>
+<div id="card"><h1 id="ch"></h1><div id="cb"></div><small id="cs"></small></div>
+<div id="main">
+  <div id="left"><p class="lbl">board · what the coordinator sees</p><div id="fw"><iframe id="f" title="hamonn board" src="about:blank"></iframe></div></div>
+  <div id="right"><p class="lbl">agents · terminal</p><div id="term"><div id="termin"></div></div></div>
+</div>
+<div id="cap"><div class="t" id="ct"></div><div class="s" id="cs2"></div></div>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+  // Card lines allow **bold** and `code` only.
+  const fmt = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`(.+?)`/g, "<code>$1</code>");
+  const cls = (l) => l.startsWith("$ (owner)") ? "own" : l.startsWith("$ ") ? "cmd" : l.startsWith("▶") ? "say"
+    : /⚠|BEHIND|DRIFT|drift|unsigned|overlap|✗|FAILED|ERR/.test(l) ? "warn" : /LANDED|✓|signed|READY|ancestor/.test(l) ? "ok" : "";
+  const BOARD_W = 1180;
+  function fit() {
+    const w = $("fw").clientWidth, h = $("fw").clientHeight, k = w / BOARD_W, f = $("f");
+    f.style.width = `${BOARD_W}px`; f.style.height = `${h / k}px`; f.style.transform = `scale(${k})`;
+  }
+  addEventListener("resize", fit); fit();
+  let frame = "", rev = -1;
+  async function tick() {
+    try {
+      const s = await (await fetch("/state", { cache: "no-store" })).json();
+      if (s.rev === rev) return;
+      rev = s.rev;
+      if (s.frame !== frame) { frame = s.frame; $("f").src = s.frame; $("url").textContent = s.frame.replace(/^https?:\/\//, ""); }
+      $("ct").textContent = s.caption; $("cs2").textContent = s.sub || "";
+      $("termin").innerHTML = s.log.slice(-48).map((l) => `<span class="${cls(l)}">${esc(l)}</span>`).join("\n");
+      const c = $("card");
+      if (s.card) {
+        c.style.display = "flex"; $("ch").textContent = s.card.title;
+        $("cb").innerHTML = s.card.lines.map((x) => `<p>${fmt(x)}</p>`).join(""); $("cs").textContent = s.card.small || "";
+      } else c.style.display = "none";
+    } catch {}
+  }
+  setInterval(tick, 200); tick();
+</script>

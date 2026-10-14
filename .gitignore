@@ -12,3 +12,5 @@ packages/core-wasm/pkg-node/
 hamonn-data/
 apps/worker/dist/
 .claude/worktrees/
+demo-out*/
+demo/record/package-lock.json

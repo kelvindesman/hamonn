@@ -8,6 +8,9 @@ keeps its context in the repo, and a coordinator **lands** the work server-side 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/kelvindesman/hamonn/apps/worker)
 
+**Live:** <https://hamonn.kelvin-6d2.workers.dev> — a Worker + Durable Objects + Queues + Artifacts deployment, built and
+deployed by Workers Builds from an Artifacts repo. The demo project boards are read-only without the admin key.
+
 > Built for the Cloudflare "Git platform for the agentic era" challenge. It is **not** "GitHub with agents on top": it is the
 > layer that makes concurrent agents safe on *any* git host — Cloudflare Artifacts is the default adapter.
 
@@ -80,7 +83,7 @@ More: [docs/architecture.md](docs/architecture.md).
 | isomorphic-git wire | contract suite against `git http-backend` with token auth, **and a landing run inside workerd** |
 | Whole system | `apps/node/test/e2e.test.ts`, `apps/cli/test/cli.test.ts`, `demo/*.sh` — real git, real HTTP |
 | Worker | bundles (995 KB / 256 KB gz incl. the 267 KB wasm kernel); boots in workerd with DO + wasm; queue/DO logic unit-tested |
-| **Cloudflare Artifacts adapter** | contract suite against a fake binding over real git objects. **Not yet run against a live Artifacts account** — the first live run is the remaining verification step |
+| **Cloudflare Artifacts adapter** | contract suite against a fake binding over real git objects (shapes match the live binding), **and the full demo run live on Cloudflare Artifacts** (2026-10-14): forks per lane, scoped tokens, server-side landing, BEHIND → rebase, gate, ancestor proof checked with plain git (`demo/verify.sh`) |
 | GitHub adapter | contract suite against a fake REST server (shapes hand-modelled from the docs, **not recorded**). PAT passthrough is not fork-scoped |
 | GitLab / Bitbucket | not built |
 
@@ -99,9 +102,14 @@ npx wrangler queues create hamonn-events
 npx wrangler deploy
 npx tsx ../cli/src/bin.ts setup <project-repo>        # prints the queue-subscription commands; add --run to execute
 ```
-Creates `ProjectDO`/`RegistryDO` (SQLite-backed), the `ARTIFACTS` binding (`namespace: default`), and consumes
+Creates `ProjectDO`/`RegistryDO` (SQLite-backed), the `ARTIFACTS` binding (`namespace: hamonn`), and consumes
 `cf.artifacts.repo.pushed` from the `hamonn-events` queue. The Deploy button needs the workspace packages published to npm and
 auto-provisioning of the Artifacts binding is unverified; if it does not provision it, deploy, enable Artifacts, then run `setup`.
+
+The reference deployment uses **Workers Builds** instead of a local `wrangler deploy`: import the repo into Artifacts,
+Workers & Pages → Create → *Continue with Artifacts*, build command `bash scripts/cf-build.sh` (installs Rust + wasm-pack and
+builds the kernel), deploy command `pnpm --filter @hamonn/worker run deploy`. Set `HAMONN_ADMIN_KEY` as a secret, then
+`POST /api/admin/repos {"name":"…"}` creates project repos through the binding (`demo/seed.sh` with `MODE=artifacts` does it).
 
 ## Repo map
 `crates/hamonn-core` (kernel) · `packages/core-wasm` · `packages/shell` · `packages/adapters/*` · `apps/{worker,node,cli}` ·

@@ -19,7 +19,7 @@ a handful of REST verbs and passing `packages/adapters/contract`.
 | Adapter | Status | Evidence |
 |---|---|---|
 | `local-fs` | complete | contract suite against **real git**; used by the end-to-end test and the CLI test |
-| `cloudflare-artifacts` | complete, **not yet live-tested** | contract suite against a fake binding backed by *real git objects*; response field names for `log`/`readCommit`/`readTree` are handled defensively because the docs do not spell them out. **First live run on a real account is the remaining verification step.** |
+| `cloudflare-artifacts` | complete, **live-tested** (2026-10-14) | contract suite against a fake binding backed by *real git objects*, returning the shapes the live binding returns (`{hash, treeHash, parents}` commits; `{name, mode, hash, type}` tree entries). The full demo ran live: forks, tokens, landing, BEHIND → rebase, gate. The first live run found one bug (`treeHash`, not `tree`). Not load-tested. |
 | `github` | complete, fixture-tested | contract suite against a fake REST server over real git. The fake's response shapes are *hand-modelled from the REST docs, not recorded* from github.com. Default token mode is PAT passthrough (**not** fork-scoped) |
 | `gitlab`, `bitbucket` | planned | no code yet; tracked as `adapter-request` issues |
 

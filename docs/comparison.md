@@ -15,8 +15,8 @@ hamonn is **complementary**: GitHub/GitLab remain the human-facing home (via ada
 layer where it can be enforced.
 
 ## Limitations (v0.1)
-- **Cloudflare Artifacts adapter has not yet run against a live account** (see `docs/adapters.md`). Artifacts is a beta
-  (Workers Paid; billing from 2026-10-14).
+- **Cloudflare Artifacts** has been run live once, end to end (the demo, 2026-10-14; see `docs/adapters.md`), not under
+  load. Artifacts is a beta (Workers Paid; billing from 2026-10-14).
 - **Landing engine bounds (Workers):** isomorphic-git, in memory (64 MiB cap), no rename detection, single merge base — a
   criss-cross history fails the lane with an error ("rebase the lane"). Use `gitwire-system-git` (Node/container) for real
   recursive merges.
