@@ -22,7 +22,7 @@
     "isomorphic-git": "^1.30.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4",
+    "@cloudflare/workers-types": "^5",
     "wrangler": "^4"
   },
   "cloudflare": {
