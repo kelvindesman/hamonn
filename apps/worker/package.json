@@ -19,7 +19,7 @@
     "@hamonn/shell": "workspace:*",
     "@hamonn/store-sql": "workspace:*",
     "hono": "^4",
-    "isomorphic-git": "^1.30.0"
+    "isomorphic-git": "^1.44.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4",
