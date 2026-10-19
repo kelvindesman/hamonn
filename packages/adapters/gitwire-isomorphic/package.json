@@ -12,7 +12,7 @@
   "dependencies": {
     "@hamonn/core": "workspace:*",
     "@hamonn/shell": "workspace:*",
-    "isomorphic-git": "^1.30.0"
+    "isomorphic-git": "^1.44.2"
   },
   "devDependencies": {
     "@hamonn/contract": "workspace:*",
