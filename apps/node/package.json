@@ -19,7 +19,7 @@
     "@hamonn/gitwire-system-git": "workspace:*",
     "@hamonn/shell": "workspace:*",
     "@hamonn/store-sqlite": "workspace:*",
-    "@hono/node-server": "^1",
+    "@hono/node-server": "^2",
     "hono": "^4",
     "@hamonn/adapter-github": "workspace:*"
   },
